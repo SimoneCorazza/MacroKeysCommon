@@ -24,7 +24,7 @@ public final class RSAClient {
 
     /**
      * @param k Chiave pubblica con la quale criptare
-     * @exception InvalidKeyException - Se la chaive è invalida
+     * @exception InvalidKeyException - Se la chaive Ã¨ invalida
      */
     public RSAClient(PublicKey k) {
         try {
