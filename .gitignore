@@ -1,4 +1,8 @@
+.settings
+.classpath
+
 # Maven
+bin/
 target/
 pom.xml.tag
 pom.xml.releaseBackup
