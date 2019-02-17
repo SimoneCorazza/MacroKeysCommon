@@ -1,6 +1,6 @@
 package com.macrokeys.netcode;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.macrokeys.netcode.TCPMessageProtocol;
 
@@ -263,7 +263,7 @@ public class TCPMessageProtocolTest {
 		a.sendMessage(msg);
 		byte[] r = b.receiveMessage();
 		
-		assertTrue("Messages must be equal", Arrays.equals(msg, r));
+		assertTrue(Arrays.equals(msg, r), "Messages must be equal");
 	}
 	
 	

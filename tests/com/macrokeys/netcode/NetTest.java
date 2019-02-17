@@ -1,6 +1,6 @@
 package com.macrokeys.netcode;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.awt.AWTException;
 import java.awt.event.KeyEvent;
@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.macrokeys.LimitedKeySequence;
 import com.macrokeys.MacroKey;
@@ -98,7 +98,7 @@ public class NetTest {
 			MacroNetClient c = new MacroNetClient("localhost");
 			c.connectToServer();
 			
-			assertTrue("Must be connected", c.isConnected());
+			assertTrue(c.isConnected(), "Must be connected");
 			
 			try {
 				Thread.sleep((long) (5000 * 1.1));
@@ -106,7 +106,7 @@ public class NetTest {
 				
 			}
 			
-			assertTrue("Must be connected", c.isConnected());
+			assertTrue(c.isConnected(), "Must be connected");
 			
 		} catch (Throwable t) {
 			t.printStackTrace();

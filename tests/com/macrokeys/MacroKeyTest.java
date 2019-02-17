@@ -1,14 +1,14 @@
 package com.macrokeys;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MacroKeyTest {
 
 
 	@Test
-	public void testSetId() {
+	public void shouldSetId() {
 		MacroKey m = new MacroKey();
 		try {
 			m.setId(-1);
@@ -23,54 +23,16 @@ public class MacroKeyTest {
 	}
 
 	@Test
-	public void testSetColorFill() {
+	public void shouldSetColorFill() {
 		MacroKey m = new MacroKey();
 		m.setColorFill(100);
-		assertTrue(m.getColorFill() == 100);
+		assertEquals(100, m.getColorFill());
+		
 		m.setColorFill(0);
-		assertTrue(m.getColorFill() == 0);
+		assertEquals(0, m.getColorFill());
+		
 		m.setColorFill(2234234);
-		assertTrue(m.getColorFill() == 2234234);
-	}
-
-	@Test
-	public void testSetArea() {
-
-	}
-
-	@Test
-	public void testSetShape() {
-		
-	}
-
-	@Test
-	public void testSetColorEdge() {
-		
-	}
-
-	@Test
-	public void testSetColorEdgePress() {
-		
-	}
-
-	@Test
-	public void testSetColorFillPress() {
-		
-	}
-
-	@Test
-	public void testSetText() {
-		
-	}
-
-	@Test
-	public void testSetKeySeq() {
-		
-	}
-
-	@Test
-	public void testClone() {
-		
+		assertEquals(2234234, m.getColorFill());
 	}
 
 }
