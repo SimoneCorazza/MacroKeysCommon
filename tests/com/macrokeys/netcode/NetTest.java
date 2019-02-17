@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.macrokeys.LimitedKeySequence;
@@ -16,6 +17,7 @@ import com.macrokeys.MacroScreen;
 import com.macrokeys.MacroSetup;
 import com.macrokeys.netcode.MacroNetClient.SSDPServerInfo;
 
+@Disabled
 public class NetTest {
 
 	@Test
