@@ -10,30 +10,36 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
- * Classe che memorizza una schermata di una MacroSetup con i relativi tasti
+ * Screen of a {@link MacroSetup}
  */
 public final class MacroScreen implements Cloneable, Serializable {
 
     /**
-	 * Seriale per {@link Serializable}
+	 * Serial for {@link Serializable}
 	 */
 	private static final long serialVersionUID = 1L;
 
 
-    /** Lista dei tasti presenti in questa schermata; non null */
+    /** List of keys of this screen; never null */
     private List<MacroKey> keys;
-    /** Colore del background; non null */
+    
+    /** Color of the background */
     private int colorBackground;
-    /** Testo di background; non null */
+    
+    /** Text of the background; never null */
     private String backgroundText;
-    /** Tipologia di swipe che richiama questa schermata ; non null */
+    
+    /** Swipe to call this screen; never null */
     private SwipeType swipeType;
-    /** Orientazione della schermata */
+    
+    /** Settings of the orientation for this screen */
     private Orientation orientation;
 
     /**
-     * Crea una macro Screen vuota
+     * Instantiate an empty screen
      */
     public MacroScreen() { 
     	keys = new ArrayList<>();
@@ -44,16 +50,14 @@ public final class MacroScreen implements Cloneable, Serializable {
     }
     
     /**
-     * Renderizza lo screen a video
-     * @param r Oggetto di rendering
-     * @param s Schermo sul quale renderizzare
-     * @param drawArea Area di rendering
-     * @param keyPress Tasti attualmente premuti
-     * @throws NullPointerException Se {@code r} o {@code s} o {@code drawArea} o
-     * {@code keyPress} è null
+     * Render this at screen
+     * @param r Rendering object
+     * @param s Screen where to render
+     * @param drawArea Area where to render
+     * @param keyPress Keys actually pressed
      */
-    public void render(Renderer r, Screen s, RectF drawArea,
-    		List<MacroKey> keyPress) {
+    public void render(@NonNull Renderer r, @NonNull Screen s, @NonNull RectF drawArea,
+    		@NonNull List<MacroKey> keyPress) {
     	Objects.requireNonNull(r);
     	Objects.requireNonNull(s);
     	Objects.requireNonNull(drawArea);
@@ -63,7 +67,7 @@ public final class MacroScreen implements Cloneable, Serializable {
         r.setAntiAlias(true);
         r.setTextAllign(TextAllign.Center);
 
-        //Sfondo e testo per il background
+        // Render backgraund color and text
         r.setPaintStyle(PaintStyle.Fill);
         r.setColor(getBackgroundColor());
         r.rect(drawArea);
@@ -71,8 +75,10 @@ public final class MacroScreen implements Cloneable, Serializable {
         
         for(MacroKey k : getKeys()) {
         	
-        	int border, fill; //Colori del tasto
-            //Controllo se è il tasto premuto (confronto tra istanze (puntatori))
+        	int border;
+        	int fill;
+        	
+            // CHeck if key was pressed (instance compare)
             if(contains(k, keyPress)) {
                 border = k.getColorEdgePress();
                 fill = k.getColorFillPress();
@@ -80,7 +86,7 @@ public final class MacroScreen implements Cloneable, Serializable {
                 border = k.getColorEdge();
                 fill = k.getColorFill();
             }
-            //Area del bottone in pixel
+            
             RectF pix = k.getAreaPixel(s);
 
             if(k.getShape().getType().equals(KeyShape.Type.Ellipse)) {
@@ -90,7 +96,7 @@ public final class MacroScreen implements Cloneable, Serializable {
                 r.setPaintStyle(PaintStyle.Stroke);
                 r.setColor(border);
                 r.ellipse(pix);
-            } else { //Caso non previto o caso rettangolo disegno come rettangolo
+            } else {
             	r.setPaintStyle(PaintStyle.Fill);
                 r.setColor(fill);
                 r.rect(pix);
@@ -106,8 +112,7 @@ public final class MacroScreen implements Cloneable, Serializable {
     /**
      * @param m
      * @param l
-     * @return True se il tasto {@code m} è contenuto nella lista {@code l},
-     * False altriemnti
+     * @return True if the key {@code m} is present in {@code l}, false otherwise
      */
     private static boolean contains(MacroKey m, List<MacroKey> l) {
     	assert m != null && l != null;
@@ -122,11 +127,11 @@ public final class MacroScreen implements Cloneable, Serializable {
     
     
     /**
-     * Renderizza la scritta all'interno dell'area indicata, se possibile
-     * @param r Componente di rendering, tramite la quale renderizzare la stringa
-     * @param s Stringa da renderizzare
-     * @param color Colore della stringa
-     * @param area Area del rettangolo dove posizionarla
+     * Render some text in the area, if possible
+     * @param r Rendering
+     * @param s Text to render
+     * @param color Color of the text
+     * @param area Area where to place the text
      */
     private static void drawStringRect(Renderer r, String s, int color, RectF area) {
     	assert r != null && s != null && area != null;
@@ -137,50 +142,50 @@ public final class MacroScreen implements Cloneable, Serializable {
 
 
     /**
-     * @return Lista (modificabile) di tasti associati alla schermata; non null
+     * @return List of keys contained vy this screen
      */
-    public List<MacroKey> getKeys() {
+    public @NonNull List<MacroKey> getKeys() {
     	assert keys != null;
         return keys;
     }
 
     /**
-     * @return Colore del background; non null
+     * @return Background color
      */
     public int getBackgroundColor() {
         return colorBackground;
     }
 
     /**
-     * @return Testo di background; non null
+     * @return Background tet
      */
-    public String getBackgroundText() {
+    public @NonNull String getBackgroundText() {
         return backgroundText;
     }
 
     /**
-     * @return Metodo di richiamo dello screen mediante gesti
+     * @return Swipe type to call this screen
      */
-    public SwipeType getSwipeType() {
+    public @NonNull SwipeType getSwipeType() {
         return swipeType;
     }
 
     /**
-     * @return Orientazione della schermata
+     * @return Orientation of this screen
      */
-    public Orientation getOrientation() {
+    public @NonNull Orientation getOrientation() {
         return orientation;
     }
 
 	/**
 	 * @param swipeType Swipe che richiama questa schermata
 	 */
-	public void setSwipeType(SwipeType swipeType) {
+	public void setSwipeType(@NonNull SwipeType swipeType) {
 		this.swipeType = swipeType;
 	}
 
 	/**
-	 * @param colorBackground Colore di background
+	 * @param colorBackground Background color
 	 */
 	public void setBackgroundColor(int colorBackground) {
 		this.colorBackground = colorBackground;
@@ -189,31 +194,29 @@ public final class MacroScreen implements Cloneable, Serializable {
 	/**
 	 * @param backgroundText Testo di background
 	 */
-	public void setBackgroundText(String backgroundText) {
+	public void setBackgroundText(@NonNull String backgroundText) {
 		this.backgroundText = backgroundText;
 	}
 
 	/**
-	 * @param orientation Orientazione della schermata
+	 * @param orientation Orientation of this screen
 	 */
-	public void setOrientation(Orientation orientation) {
+	public void setOrientation(@NonNull Orientation orientation) {
 		this.orientation = orientation;
 	}
 
 	/**
-     * Rileva se alle coordinate fornite si trova un tasto
-     * @param x Coordinata X della pressione in pixel
-     * @param y Coordinata y della pressione in pixel
-     * @param s Schermo correntemente utilizzato
-     * @return Tasto presente; null se nessun tasto è presente
-     * @throws NullPointerException Se {@code s} è null
+     * Indicates if at the given position there is a key
+     * @param x X position in pixels
+     * @param y Y position in pixels
+     * @param s Screen used
+     * @return Key found at the given position; null if none
      */
-	public MacroKey keyAt(float x, float y, Screen s) {
+	public MacroKey keyAt(float x, float y, @NonNull Screen s) {
 		Objects.requireNonNull(s);
 		
-		//Scandisco al contrario per coerenza con il rendering
-		//(se vengono renderizzate dalla testa alla coda -> l'utente vede per
-		//prima le cose renderizzate per ultime)
+		// Backword iteration to match the rendering order
+		// (the first item in the queque is rendered first -> is overlapped by other keys)
 		ListIterator<MacroKey> it = getKeys().listIterator(getKeys().size());
         while (it.hasPrevious()) {
         	MacroKey k = it.previous();
@@ -225,15 +228,14 @@ public final class MacroScreen implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * Indica se il tasto indicato è stato intersecato dal punto
-	 * @param m Tasto da testare; non null
-	 * @param s Oggetto schermo da cui ricavare le informazioni
-	 * sulla reale dimensione del tasto; non null
-	 * @param x Coordinata X del punto da testare
-	 * @param y Coordinata Y del punto da testare
-	 * @return Risultato dell'intersezione: true avvennuta
+	 * Indicates if the key is intersected in the given point
+	 * @param m key to check
+	 * @param s Screen where the key is rendered
+	 * @param x X position in pixels
+	 * @param y Y position in pixels
+	 * @return True the key is intersected, false otherwise
 	 */
-	private static boolean keyIntersect(MacroKey m, Screen s, float x, float y) {
+	private static boolean keyIntersect(@NonNull MacroKey m, @NonNull Screen s, float x, float y) {
 		assert m != null && s != null;
 		
 		final RectF r = m.getAreaPixel(s);
@@ -253,14 +255,14 @@ public final class MacroScreen implements Cloneable, Serializable {
 	}
 	
 	/**
-	 * Testa l'intersezione tra un ellisse (aventi glia assi concordanti con gli assi cartesiani) e un punto
-	 * @param cx Coordinata X del centro dell'ellisse
-	 * @param cy Coordinata Y del centro dell'ellisse
-	 * @param rx Raggio sull'asse X dell'ellisse
-	 * @param ry Raggio sull'asse Y dell'ellisse
-	 * @param x Coordinata X del punto da testare
-	 * @param y Coordinata X del punto da testare
-	 * @return Risultato del test: true intersezione avvenuta
+	 * Checks whether an ellipse intersect a pointTesta l'intersezione tra un ellisse
+	 * @param cx X position of the center
+	 * @param cy Y poisition of the center of the ellipse
+	 * @param rx Radius on the X axis of the ellipse
+	 * @param ry Radius on the Y axis of the ellipse
+	 * @param x X position of the point
+	 * @param y Y position of the point
+	 * @return True if there is the intersection, false otherwise
 	 * @see {@linkplain http://math.stackexchange.com/questions/76457/check-if-a-point-is-within-an-ellipse}
 	 */
 	private static boolean pointInEllipse(float cx, float cy, float rx, float ry, float x, float y) {
@@ -315,7 +317,7 @@ public final class MacroScreen implements Cloneable, Serializable {
 	}
 	
 
-    /** Gesto che richiama la schermata */
+    /** Swipe to call this screen */
     public enum SwipeType {
         Finger2_Up,
         Finger2_Right,
@@ -328,13 +330,13 @@ public final class MacroScreen implements Cloneable, Serializable {
         Finger3_Left
     }
 
-    /** Orientamento della schermata */
+    /** Orientation of the screen */
     public enum Orientation {
-        /** Verticale */
+        /** Vertical */
         Vertical,
-        /** Orizzontale */
+        /** Horizontal */
         Horizontal,
-        /** In base all'accelerometro */
+        /** Gets rotation from the accelerometer */
         Rotate
     }
 }

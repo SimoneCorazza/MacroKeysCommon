@@ -2,15 +2,17 @@ package com.macrokeys;
 
 import java.io.*;
 
-/** Classe statica contenente utility per java */
+/** 
+ * Static class for Java utilities
+ */
 final class JavaUtil {
 	
 	private JavaUtil() {}
 	
 	/**
-	 * Effettua una deep copy dell'oggetto indicato
-	 * @param obj Oggetto da clonare
-	 * @return Oggetto clonato; null se c'è un problema con la serializzazione
+	 * Deep clone the given object
+	 * @param obj Serializable Object to clone
+	 * @return Cloned object; null if there is a problem when cloning
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends Serializable> T utilDeepClone(T obj) {

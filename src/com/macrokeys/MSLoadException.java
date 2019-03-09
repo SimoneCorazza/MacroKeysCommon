@@ -1,10 +1,10 @@
 package com.macrokeys;
 
-/** Eccezione dovuta ad un errore di caricamento di una {@link MacroSetup} */
+/** Exception when an error occur while loading a {@link MacroSetup} */
 public class MSLoadException extends Exception {
 
 	/**
-	 * Seriale per {@link Exception}
+	 * Serial for {@link Exception}
 	 */
 	private static final long serialVersionUID = 1L;
 

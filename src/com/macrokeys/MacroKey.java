@@ -3,45 +3,55 @@ package com.macrokeys;
 import java.io.Serializable;
 import java.util.Objects;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.macrokeys.rendering.Color;
 import com.macrokeys.rendering.RectF;
 import com.macrokeys.screen.Screen;
 import com.macrokeys.screen.ScreenUtility;
 
 /**
- * Tasto presente in una MacroScreen, associato ad una macro
+ * Key present in a {@link MacroScreen}
  */
 public final class MacroKey implements Cloneable, Serializable, Comparable<MacroKey> {
     /**
-	 * Seriale per {@link Serializable}
+	 * Serial for {@link Serializable}
 	 */
 	private static final long serialVersionUID = 2L;
 
-	/** Identificativo del tasto all'interno della {@link MacroSetup} */
+	/** Identifier of the key in the {@link MacroSetup} */
 	private int id = -1;
 	
-	/** Sequenza di pressioni associata alla pressione del tasto */
+	/** Sequence of keys associated with this macro key */
 	private LimitedKeySequence macroSeq;
-    /** Area occupata dal tasto in millimetri; non null */
+	
+    /** Area occupied by this key at screen in millimiters; never null */
     private RectF area;
-    /** Forma del tasto; non null */
+    
+    /** Shape of the key; never null */
     private KeyShape shape;
-    /** Colore del bordo; non null */
+    
+    /** Color of the border; never null */
     private int colorEdge;
-    /** Colore del riempimento; non null */
+    
+    /** Color of the fill; never null */
     private int colorFill;
-    /** Colore del bordo quando il tasto è premuto; non null */
+    
+    /** Color of the border when the key is pressed; never null */
     private int colorEdgePress;
-    /** Colore del riempimento quando il tasto è premuto; non null */
+    
+    /** Color of the fill when the key is pressed; never null */
     private int colorFillPress;
-    /** Stringa con il testo da mostrare; non null */
+    
+    /** String of the test to render; never null */
     private String text;
-    /** Tipologia di tasto */
+    
+    /** Type of key */
     private MacroKeyType type;
 
 
     /**
-     * Istanzia un nuovo tasto con le proprietà di default
+     * Instance a new key with default property
      */
     public MacroKey() {
     	setArea(new RectF(0, 0, 1, 1));
@@ -57,7 +67,7 @@ public final class MacroKey implements Cloneable, Serializable, Comparable<Macro
 
 
     /**
-	 * @return ID del tasto; disponibile solo dopo il caricamento
+	 * @return Identifier of the key; available only after the loading
 	 */
 	public int getId() {
 		return id;
@@ -65,8 +75,8 @@ public final class MacroKey implements Cloneable, Serializable, Comparable<Macro
 
 
 	/**
-	 * @param ID del tasto; >= 0
-	 * @throws IllegalArgumentException Se  {@code id} < 0
+	 * @param Identifier of the key; >= 0
+	 * @throws IllegalArgumentException If {@code id} is < 0
 	 */
 	void setId(int id) {
 		if(id < 0) {
@@ -77,80 +87,77 @@ public final class MacroKey implements Cloneable, Serializable, Comparable<Macro
 
 
 	/**
-     * @return Area (non modificabile) occupata dal tasto a schermo in millimetri; non null
-     *   heigth e width sempre > 0
+     * @return Area (not editable) of the key at screen in millimiters; never null
+     *   heigth and width always > 0
      */
     public RectF getArea() {
         return new RectF(area);
     }
     
     /**
-     * @param s Schermo per il quale fornire la dimensione
-     * @return Area occupata dal tasto a schermo in pixel; non null
-     * @throws NullPointerException Se {@code s} è null
+     * @param s Screen for which obtein the area of this key
+     * @return Area of the key at scrren in pixels
+     * @throws NullPointerException If {@code s} is null
      */
-    public RectF getAreaPixel(Screen s) {
+    public @NonNull RectF getAreaPixel(@NonNull Screen s) {
     	Objects.requireNonNull(s);
     	return ScreenUtility.mmtopx(area, s);
     }
 
     /**
-     * @return Forma del tasto; non null, modificabile
+     * @return Shape of the key; is editable
      */
-    public KeyShape getShape() {
+    public @NonNull KeyShape getShape() {
         return shape;
     }
 
     /**
-     * @return Colore del bordo
+     * @return Color of the border
      */
     public int getColorEdge() {
         return colorEdge;
     }
 
     /**
-     * @return Colore di riempimento
+     * @return Color of the filling of the key
      */
     public int getColorFill() {
         return colorFill;
     }
 
     /**
-     * @return Testo del tasto; non null
+     * @return Text of the key
      */
-    public String getText() {
+    public @NonNull String getText() {
         return text;
     }
 
     /**
-     * @return Colore del bordo quando il tasto è premuto
+     * @return Color of the border of the key when is pressed
      */
     public int getColorEdgePress() {
         return colorEdgePress;
     }
 
     /**
-     * @return Colore di riempimento quando il tasto è premuto
+     * @return Color of the filling of the key when is pressed
      */
     public int getColorFillPress() {
         return colorFillPress;
     }
     
-    
-    
     /**
-     * @param c Colore di riempimento
+     * @param c Color of the filling
      */
     public void setColorFill(int c) {
     	colorFill = c;
     }
 
-
 	/**
-	 * @param area Area a schermo del tasto in millimetri; non null
-	 *  heigth e width sempre > 0
+	 * @param area Area of the key at screen in millimiters; heigth e width sempre > 0
+	 *  @throws IllegalArgumentException If the area of the key is 0
 	 */
-	public void setArea(RectF area) {
+	public void setArea(@NonNull RectF area) {
 		Objects.requireNonNull(area);
 		if(area.width() < 0 || area.height() < 0) {
 			throw new IllegalArgumentException("The width and heigth must be >= 0");
@@ -161,16 +168,16 @@ public final class MacroKey implements Cloneable, Serializable, Comparable<Macro
 
 
 	/**
-	 * @param shape Forma del tasto; non nullo
+	 * @param shape Shape of the key
 	 */
-	public void setShape(KeyShape shape) {
+	public void setShape(@NonNull KeyShape shape) {
 		Objects.requireNonNull(shape);
 		this.shape = shape;
 	}
 
 
 	/**
-	 * @param colorEdge Colore del bordo
+	 * @param colorEdge Color of the edge
 	 */
 	public void setColorEdge(int colorEdge) {
 		this.colorEdge = colorEdge;
@@ -178,7 +185,7 @@ public final class MacroKey implements Cloneable, Serializable, Comparable<Macro
 
 
 	/**
-	 * @param colorEdgePress Colore del bordo quando il tasto è premuto
+	 * @param colorEdgePress Color of the edge when the key is pressed
 	 */
 	public void setColorEdgePress(int colorEdgePress) {
 		this.colorEdgePress = colorEdgePress;
@@ -186,7 +193,7 @@ public final class MacroKey implements Cloneable, Serializable, Comparable<Macro
 
 
 	/**
-	 * @param colorFillPress Colore di riempimento quando il tasto è premuto
+	 * @param colorFillPress Color of the fiiling when the key is pressed
 	 */
 	public void setColorFillPress(int colorFillPress) {
 		this.colorFillPress = colorFillPress;
@@ -194,7 +201,7 @@ public final class MacroKey implements Cloneable, Serializable, Comparable<Macro
 
 
 	/**
-	 * @param text Testo del tasto
+	 * @param text Text of the key
 	 */
 	public void setText(String text) {
 		this.text = text == null ? "" : text;
@@ -202,23 +209,22 @@ public final class MacroKey implements Cloneable, Serializable, Comparable<Macro
 	
 	
     /**
-	 * @return Sequenza di tasti associata al tasto; non null, modificabile
+	 * @return Sequence of keys associeted with the key
 	 */
-	public LimitedKeySequence getKeySeq() {
+	public @NonNull LimitedKeySequence getKeySeq() {
 		return macroSeq;
 	}
 
 	/**
-	 * @param keySeq Sequenza di tasti da associare al tasto
-	 * @throws NullPointerException Se {@code keySeq} è null
+	 * @param keySeq Sequence of keys associeted with this
 	 */
-	public void setKeySeq(LimitedKeySequence keySeq) {
+	public void setKeySeq(@NonNull LimitedKeySequence keySeq) {
 		Objects.requireNonNull(keySeq);
 		this.macroSeq = keySeq;
 	}
 
 	/**
-	 * @return Tipologia di comportamento del testo
+	 * @return Key type
 	 */
 	public MacroKeyType getType() {
 		return type;
@@ -226,8 +232,7 @@ public final class MacroKey implements Cloneable, Serializable, Comparable<Macro
 
 
 	/**
-	 * Imposta la tipologia del comportamento del tasto
-	 * @param keystrokeOnUp Valore della tipologia
+	 * @param keystrokeOnUp Key type
 	 */
 	public void setType(MacroKeyType type) {
 		this.type = type;
@@ -238,14 +243,13 @@ public final class MacroKey implements Cloneable, Serializable, Comparable<Macro
 		return JavaUtil.utilDeepClone(this);
     }
 	
-	/**
-	 * Equivalenza eseguita su OGNI attributo non solo sull'id
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if(obj == null || !(obj instanceof MacroKey)) {
 			return false;
 		} else {
+			// Executing the cheks for every field not only the ID
+			
 			MacroKey k2 = (MacroKey)obj;
 			return getId() == k2.getId() &&
 				    getType() == k2.getType() &&

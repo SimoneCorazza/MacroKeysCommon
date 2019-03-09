@@ -19,35 +19,39 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.macrokeys.rendering.RectF;
 import com.macrokeys.rendering.Renderer;
 import com.macrokeys.screen.Screen;
+import static com.macrokeys.MacroScreen.SwipeType;
 
 /**
- * Classe che rappresenta un insieme di schermate con i relativi tasti
+ * Manage a set of {@link MacroScreen}
  */
 public final class MacroSetup implements Serializable {
 
     /**
-	 * Seriale per {@link Serializable}
+	 * Serial for {@link Serializable}
 	 */
 	private static final long serialVersionUID = 1L;
 
-	/** Schermate delle macro */
+	/** Screens that compose this setup; never null */
     private List<MacroScreen> screens;
 
-    /** Schermata attualmente in uso; mai null */
+    /** Current selected screen; never null */
     private MacroScreen actualScreen;
     
     
     
     /**
-     * @param l Lista contenente le schermate (viene copiata)
-     * @throws IllegalArgumentException Se {@code l} è null o vuota
+     * @param l Screens to include
+     * @throws IllegalArgumentException If {@code l} is empty
      */
-    public MacroSetup(List<MacroScreen> l) {
-    	if(l == null || l.isEmpty()) {
-    		throw new IllegalAccessError("List null or empty");
+    public MacroSetup(@NonNull List<MacroScreen> l) {
+    	Objects.requireNonNull(l);
+    	if(l.isEmpty()) {
+    		throw new IllegalArgumentException("List null or empty");
     	}
     	
     	screens = new ArrayList<>(l);
@@ -56,15 +60,14 @@ public final class MacroSetup implements Serializable {
     
     
     /**
-     * Renderizza lo screen a video
-     * @param r Oggetto di rendering
-     * @param s Schermo sul quale renderizzare
-     * @param drawArea Area di rendering
-     * @param keyPress Tasti attualmente premuti
-     * @throws NullPointerException Se {@code r} o {@code s} o {@code drawArea} o
-     * {@code keyPress} è null
+     * REnder the screen
+     * @param r Rendering
+     * @param s Screen to render
+     * @param drawArea Where to render
+     * @param keyPress Keys actually pressed
      */
-    public void render(Renderer r, Screen s, RectF drawArea, List<MacroKey> keyPress) {
+    public void render(@NonNull Renderer r, @NonNull Screen s, @NonNull RectF drawArea,
+    		@NonNull List<MacroKey> keyPress) {
     	assert actualScreen != null;
     	actualScreen.render(r, s, drawArea, keyPress);
     }
@@ -72,18 +75,18 @@ public final class MacroSetup implements Serializable {
     
     
     /**
-     * Carica una {@link MacroSetup}
+     * Loads a {@link MacroSetup}
      * <p>Per approfondire le eccezzioni contenute in {@link MSLoadException}
      * vedere {@link ObjectInputStream#readObject()}</p>
-     * @param path Percorso dal quale caricare il file
-     * @return {@link MacroSetup} caricata; non null
-     * @throws IOException Se c'è un errore di IO
-     * @throws FileNotFoundException  Se il file non è stato trovato
-     * @throws SecurityException Se il file indicato non può essere letto
-     * @throws MSLoadException Se c'è un errore di caricamento del file (es. versione non corrisponde)
-     * @throws NullPointerException Se {@code path} è null
+     * @param path File path to load
+     * @return Loading result
+     * @throws IOException If there is an IO error
+     * @throws FileNotFoundException  If the file was not found
+     * @throws SecurityException If the file cannot be read
+     * @throws MSLoadException If there is an error on the loading of the file.
+     * See {@link ObjectInputStream#readObject()} for more information
      */
-    public static MacroSetup load(String path)
+    public static @NonNull MacroSetup load(@NonNull String path)
     		throws IOException, MSLoadException {
     	Objects.requireNonNull(path);
     	
@@ -94,18 +97,18 @@ public final class MacroSetup implements Serializable {
     }
     
     /**
-     * Carica una {@link MacroSetup}
+     * Loads a {@link MacroSetup}
      * <p>Per approfondire le eccezzioni contenute in {@link MSLoadException}
      * vedere {@link ObjectInputStream#readObject()}</p>
-     * @param path Percorso dal quale caricare il file
-     * @return {@link MacroSetup} caricata; non null
-     * @throws IOException Se c'è un errore di IO
-     * @throws StreamCorruptedException Se l'header non è corretto
-     * @throws SecurityException If untrusted subclass illegally overrides security-sensitive methods
-     * @throws MSLoadException Se c'è un errore di caricamento del file (es. versione non corrisponde)
-     * @throws NullPointerException Se {@code instr} è null
+     * @param instr Input stream
+     * @return Loading result
+     * @throws IOException If there is an IO error
+     * @throws FileNotFoundException  If the file was not found
+     * @throws SecurityException If the file cannot be read
+     * @throws MSLoadException If there is an error on the loading of the file.
+     * See {@link ObjectInputStream#readObject()} for more information
      */
-    public static MacroSetup load(InputStream instr)
+    public static @NonNull MacroSetup load(@NonNull InputStream instr)
     		throws IOException, MSLoadException {
     	Objects.requireNonNull(instr);
     	
@@ -121,13 +124,14 @@ public final class MacroSetup implements Serializable {
     }
     
     /**
-     * Permette di adattare le schermate presenti alla dimensione specificata.
-     * In ogni caso i tasti hanno una dimensione minima oltre la quale
-     * non è più possibile rimpicciolire.
-     * @param width Spazio sull'asse X in millimetri disponibile; > 0
-     * @param height Spazio sull'asse Y in millimetri disponibile; > 0
-     * @return Clone di this che sta nello spazio indicato
-     * @throws IllegalArgumentException se i vincoli dei parametri non sono rispettati
+     * Adapt the {@link MacroScreen}s in this setup in the given size.
+     * <br/>
+     * The keys have a minum size which cannot be exceded.
+     * @param width Space on the X axis in millimiters
+     * @param height Space on the Y axis in millimiters
+     * @return Copy of this instance with the relative {@link MacroScreen}s
+     * that fits in the given sizes
+     * @throws IllegalArgumentException If one of the size if <= 0
      */
     public MacroSetup fitFor(float width, float height) {
     	if(width < 0 || height < 0) {
@@ -151,14 +155,15 @@ public final class MacroSetup implements Serializable {
     }
     
     
-    
     /**
-     * Adatta la schermata indicata allo spazio indicato
-     * @param width Spazio sull'asse X in millimetri disponibile; > 0
-     * @param height Spazio sull'asse Y in millimetri disponibile; > 0
-     * @param m Schermata da modificare
+     * Adapt the {@link MacroScreen} in this setup in the given size.
+     * <br/>
+     * The keys have a minum size which cannot be exceded.
+     * @param width Space on the X axis in millimiters; > 0
+     * @param height Space on the Y axis in millimiters; > 0
+     * @param m Screen to fit
      */
-    private void fitFor(float width, float height, MacroScreen m) {
+    private void fitFor(float width, float height, @NonNull MacroScreen m) {
     	assert width > 0 && height > 0;
     	assert m != null;
     	
@@ -188,13 +193,12 @@ public final class MacroSetup implements Serializable {
     
     
     /**
-     * Salva this come file
-     * @param path Percorso dove salvare il file
-     * @throws IOException Se c'è un errore di IO
-     * @throws SecurityException Se non si hanno i privilegi di scrittura
-     * @throws NullPointerException Se {@code path} è null
+     * Save this as a file
+     * @param path Path where to save the file
+     * @throws IOException If an IO error occurs
+     * @throws SecurityException If there are no write privileges
      */
-    public void save(String path) throws IOException {
+    public void save(@NonNull String path) throws IOException {
     	Objects.requireNonNull(path);
     	
 		FileOutputStream fout = new FileOutputStream(path);
@@ -203,13 +207,12 @@ public final class MacroSetup implements Serializable {
     }
     
     /**
-     * Salva this nello stream
-     * @param path Percorso dove salvare il file
-     * @throws IOException Se c'è un errore di IO
-     * @throws SecurityException If untrusted subclass illegally overrides security-sensitive methods
-     * @throws NullPointerException Se {@code outstr} è null
+     * Save this on the given stream
+     * @param outstr Stream
+     * @throws IOException If an IO error occurs
+     * @throws SecurityException If there are no write privileges
      */
-    public void save(OutputStream outstr) throws IOException {
+    public void save(@NonNull OutputStream outstr) throws IOException {
     	Objects.requireNonNull(outstr);
     	
     	generateMacroKeysIDs();
@@ -223,9 +226,9 @@ public final class MacroSetup implements Serializable {
     }
     
     /**
-     * Salva this come un'array di byte
-     * @return Array di byte rappresentanti this
-     * @throws IOException Se c'è un errore di IO
+     * Save this as annay of bytes
+     * @return Data that rapresents this intance
+     * @throws IOException If an IO error occurs
      */
     public byte[] saveAsByteArray() throws IOException {
     	ByteArrayOutputStream str = new ByteArrayOutputStream();
@@ -235,7 +238,9 @@ public final class MacroSetup implements Serializable {
     
     
 
-    /** Genera gli ID per i {@link MacroKey} contenuti in {@code this} */
+    /** 
+     * Generates the ids of the {@link MacroKey} in the {@link MacroScreen}s
+     */
     private void generateMacroKeysIDs() {
     	int counter = 0;
     	for(MacroScreen s : getMacroScreens()) {
@@ -246,10 +251,10 @@ public final class MacroSetup implements Serializable {
     }
     
     /**
-     * Ottiene il macro key con l'id indicato
-     * @param id ID relativo al {@link MacroKey} da ottenere
-     * @return Tasto desiderato; null se non trovato
-     * @throws IllegalArgumentException Se {@code id} < 0
+     * Gets the {@link MacroKey} with the given id
+     * @param id If of the {@link MacroKey} to get
+     * @return Obtained key; null if not found
+     * @throws IllegalArgumentException If {@code id} < 0
      */
     public MacroKey macroKeyFromID(int id) {
     	if(id < 0) {
@@ -268,28 +273,29 @@ public final class MacroSetup implements Serializable {
     }
 
     /**
-     * @return Schermate delle macro
+     * @return Screens of this setup; the list is read only
      */
-    public List<MacroScreen> getMacroScreens() {
+    public @NonNull List<MacroScreen> getMacroScreens() {
         return Collections.unmodifiableList(screens);
     }
 
     /**
-     * @return Schermata attualmente in uso; non null
+     * @return Selected {@link MacroScreen}
      */
-    public MacroScreen getActualScreen() {
+    public @NonNull MacroScreen getActualScreen() {
     	assert actualScreen != null;
         return actualScreen;
     }
 
     /**
-     * Cambia la schermata attuale con quella avente lo swipe indicato
-     * @param swipe Swipe associato alla schermata da cambiare
-     * @return True: lo swipe è associato a una schermata
+     * Change the current {@link MacroScreen} with the {@link MacroScreen}
+     * associated with the given swipe
+     * @param swipe Swipe associeted to the {@link MacroScreen} to select
+     * @return True if the {@code swipe} is associated with a {@link MacroScreen} and was successful changesd
      */
-    public boolean changeScreen(MacroScreen.SwipeType swipe) {
+    public boolean changeScreen(@NonNull SwipeType swipe) {
         for(MacroScreen m : screens) {
-            MacroScreen.SwipeType t = m.getSwipeType();
+            SwipeType t = m.getSwipeType();
             if(t.equals(swipe)) {
                 actualScreen = m;
                 return true;

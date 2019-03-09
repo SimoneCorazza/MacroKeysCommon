@@ -3,11 +3,11 @@ package com.macrokeys.netcode;
 import java.io.Serializable;
 
 /**
- * Eccezione per le operazioni che richiedono una connessione che non è stata stabilita
+ * Exception used when a required connection was not established
  */
 public class ConnectionNotSetException extends RuntimeException {
 
-	/** Seriale per {@link Serializable} */
+	/** Serial for {@link Serializable} */
 	private static final long serialVersionUID = 1L;
 
 	public ConnectionNotSetException() {

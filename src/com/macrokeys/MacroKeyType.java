@@ -1,21 +1,26 @@
 package com.macrokeys;
 
-/** Tipologia di macro key */
+/** Type of {@link MacroKey} */
 public enum MacroKeyType {
-	/** La sequenza di tasti viene premuta e rilasciata quando il
-	 * {@link MacroKey} viene rispettivamente premuto e
-	 * rilasciato. Utile nei videogiochi
+	/**
+	 * The sequence is pressed and released when the {@link MacroKey} is 
+	 * respectively pressed and released.
+	 * <br/>
+	 * Useful in videogames.
 	 */
 	Game,
-	/** La sequenza di tasti viene premuta e rilasciata periodicamente
-	 * quando il {@link MacroKey} è premuto. Utile per macro e
-	 * programmi di scrittura
+	/**
+	 * The sequence of keys is pressed and released periodically while
+	 * the {@link MacroKey} is pressed.
+	 * <br/>
+	 * Useful for macro and writing programs.
 	 */
 	Normal,
 	/** 
-	 * La sequenza di tasti viene premuto e rilasciato al rilascio del
-	 * {@link MacroKey}.
-	 * Utile per evitare ripetizioni inavvertite
+	 * The sequence of keys is pressed and released when the
+	 * {@link MacroKey} is released.
+	 * <br/>
+	 * Useful to avoid unwanted cliks.
 	 */
 	OnRelease
 }
