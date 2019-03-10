@@ -7,24 +7,29 @@ import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-/** Permette di criptare messaggi con la crittografia RSA */
+/**
+ * Allows you to encrypt messages with RSA encryption
+ */
 public final class RSAClient {
 
-    /** Chiave pubblica tramite la quale criptare i messaggi */
+    /**
+     * Public key with which to encrypt the messages
+     */
     private PublicKey publicKey;
 
-    /** Per criptare */
+    /**
+     * To encrypt
+     */
     private Cipher cEnc;
 
     /**
-     * @param k Chiave pubblica con la quale criptare
-     * @exception InvalidKeyException - Se la chaive è invalida
+     * @param k the public Key with which to encrypt
+     * @exception InvalidKeyException - If the key is invalid
      */
     public RSAClient(PublicKey k) {
         try {
@@ -32,14 +37,15 @@ public final class RSAClient {
             cEnc = Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
             cEnc.init(Cipher.ENCRYPT_MODE, publicKey);
         } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
-            if (!false) throw new AssertionError("Algorithm must be present");
+            if (!false)
+                throw new AssertionError("Algorithm must be present");
         }
     }
 
     /**
-     * Cripta la sequenza di dati
-     * @param data Dati da criptare
-     * @return Dati criptati
+     * Crypt the sequence of data
+     * @param data Data to encrypt
+     * @return the encrypted Data
      */
     public byte[] encript(byte[] data) {
         try {
@@ -51,16 +57,16 @@ public final class RSAClient {
     }
 
     /**
-     * @return Chiave pubblica
+     * @return the public Key
      */
     public PublicKey getPublicKey() {
         return publicKey;
     }
 
     /**
-     * Converte una sequenza di byte nella rispettiva chiave pubblica
-     * @param b Sequenza da convertire
-     * @return Chiave pubblica
+     * Converts a sequence of bytes in the corresponding public key
+     * @param b the Sequence to be converted
+     * @return the public Key
      */
     public static PublicKey byteToPublicKey(byte[] b) {
         try {
@@ -68,9 +74,7 @@ public final class RSAClient {
             EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(b);
             return keyFactory.generatePublic(publicKeySpec);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-        	throw new AssertionError();
+            throw new AssertionError();
         }
     }
 }
-
-

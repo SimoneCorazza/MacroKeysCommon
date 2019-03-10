@@ -1,22 +1,23 @@
 package com.macrokeys.screen;
 
-
-/** Classe che astrae uno schermo in uso */
+/**
+ * Class that abstracts a screen in use
+ */
 public abstract class Screen {
-	
-	/**
-	 * Inizializza sulo schermo principale, se disponibile
-	 */
-	public Screen() { }
-	
-	/**
-	 * @return Dpi sull'asse X dello schermo
-	 */
-	public abstract float getXDpi();
-	
-	/**
-	 * @return Dpi sull'asse Y dello schermo
-	 */
-	public abstract float getYDpi();
-	
+
+    /**
+     * Initializes on the main screen, if available
+     */
+    public Screen() {
+    }
+
+    /**
+     * @return Dpi on the X-axis of the screen
+     */
+    public abstract float getXDpi();
+
+    /**
+     * @return Dpi for the Y axis of the screen
+     */
+    public abstract float getYDpi();
 }
