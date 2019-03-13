@@ -1,61 +1,59 @@
 package com.macrokeys.rendering;
 
-/**
- * Object rendering
- */
+/** Oggetto di rendering */
 public interface Renderer {
-
-    /**
-     * Set the new color rendering
-     * @param argb the New color
-     */
-    void setColor(int argb);
-
-    /**
-     * Sets the anti-aliasing
-     * @param aa Active disable the AA
-     */
-    void setAntiAlias(boolean aa);
-
-    /**
-     * Sets the mode of rendering
-     * @param p the Way of rendering
-     * @throws NullPointerException If {@code p} is null
-     */
-    void setPaintStyle(PaintStyle p);
-
-    /**
-     * Sets the alignment of the text
-     * @param t
-     * @throws NullPointerException If {@code t} is null
-     */
-    void setTextAllign(TextAllign t);
-
-    /**
-     * Sets the height of the text
-     * @param textSize the text Height
-     */
-    void setTextSize(float textSize);
-
-    /**
-     * Renders a ellipse/oval into the specified area
-     * @param Area
-     * @throws NullPointerException If {@code a} is null
-     */
-    void ellipse(RectF a);
-
-    /**
-     * Renders a rectangle in the area indicated
-     * @param Area
-     * @throws NullPointerException If {@code a} is null
-     */
-    void rect(RectF a);
-
-    /**
-     * Render the string s in the specified coordinates with the set set
-     * @param s the String to render
-     * @param r the Area where to place the string
-     * @throws NullPointerException If {@code s}, or {@code r} are null
-     */
-    void text(String s, RectF r);
+	
+	/**
+	 * Imposta il nuovo colore di rendering
+	 * @param argb Nuovo colore
+	 */
+	void setColor(int argb);
+	
+	/**
+	 * Imposta l'anti aliasing
+	 * @param aa Attiva disattiva l'AA
+	 */
+	void setAntiAlias(boolean aa);
+	
+	/**
+	 * Imposta il modo di rendering
+	 * @param p Modo di rendering
+	 * @throws NullPointerException Se {@code p} è null
+	 */
+	void setPaintStyle(PaintStyle p);
+	
+	/**
+	 * Imposta l'allineamento del testo 
+	 * @param t
+	 * @throws NullPointerException Se {@code t} è null
+	 */
+	void setTextAllign(TextAllign t);
+	
+	/**
+	 * Imposta l'altezza del testo
+	 * @param textSize Altezza del testo; > 0
+	 */
+	void setTextSize(float textSize);
+	
+	/**
+	 * Renderizza un ellisse/ovale nell'area indicata
+	 * @param a Area
+	 * @throws NullPointerException Se {@code a} è null
+	 */
+	void ellipse(RectF a);
+	
+	/**
+	 * Renderizza un rettangolo nell'area indicata
+	 * @param a Area
+	 * @throws NullPointerException Se {@code a} è null
+	 */
+	void rect(RectF a);
+	
+	/**
+	 * Renderizza la stringa s nelle coordinate indicate con lo settato impostato
+	 * @param s Stringa da renderizzare
+	 * @param r Area dove posizionare la stringa
+	 * @throws NullPointerException Se {@code s} o {@code r} sono null
+	 */
+	void text(String s, RectF r);
 }

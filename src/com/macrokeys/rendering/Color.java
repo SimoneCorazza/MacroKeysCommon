@@ -4,31 +4,29 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Objects;
 
-/**
- * Static class utility colors
- */
+/** Classe statica di utility per i colori */
 public final class Color {
-
-    private Color() {
-    }
-
-    /**
-     * Parse the color string, and return the corresponding color-int
+	
+	private Color() { }
+	
+	/**
+     * Parse the color string, and return the corresponding color-int.
      * If the string cannot be parsed, throws an IllegalArgumentException
      * exception. Supported formats are:
      * #RRGGBB
      * #AARRGGBB
      * or one of the following names:
      * 'red', 'blue', 'green', 'black', 'white', 'gray', 'cyan', 'magenta',
-     * 'yellow', 'lightgray', 'darkgray', 'grey', 'light grey', 'darkgrey',
+     * 'yellow', 'lightgray', 'darkgray', 'grey', 'lightgrey', 'darkgrey',
      * 'aqua', 'fuchsia', 'lime', 'maroon', 'navy', 'olive', 'purple',
      * 'silver', 'teal'.
-     * @throws NullPointerException If {@code colorString} is null
+     * @throws NullPointerException Se {@code colorString} è null
      */
     public static int parseColor(String colorString) {
-        Objects.requireNonNull(colorString);
+    	Objects.requireNonNull(colorString);
+    	
         if (colorString.charAt(0) == '#') {
-            // Use a long to avoid rollover on #ffXXXXXX
+            // Use a long to avoid rollovers on #ffXXXXXX
             long color = Long.parseLong(colorString.substring(1), 16);
             if (colorString.length() == 7) {
                 // Set the alpha value
@@ -36,7 +34,7 @@ public final class Color {
             } else if (colorString.length() != 9) {
                 throw new IllegalArgumentException("Unknown color");
             }
-            return (int) color;
+            return (int)color;
         } else {
             Integer color = sColorNameMap.get(colorString.toLowerCase(Locale.ROOT));
             if (color != null) {
@@ -45,31 +43,22 @@ public final class Color {
         }
         throw new IllegalArgumentException("Unknown color");
     }
-
-    public static final int BLACK = 0xFF000000;
-
-    public static final int DKGRAY = 0xFF444444;
-
-    public static final int GRAY = 0xFF888888;
-
-    public static final int LTGRAY = 0xFFCCCCCC;
-
-    public static final int WHITE = 0xFFFFFFFF;
-
-    public static final int RED = 0xFFFF0000;
-
-    public static final int GREEN = 0xFF00FF00;
-
-    public static final int BLUE = 0xFF0000FF;
-
-    public static final int YELLOW = 0xFFFFFF00;
-
-    public static final int CYAN = 0xFF00FFFF;
-
-    public static final int MAGENTA = 0xFFFF00FF;
-
+    
+    
+    
+    public static final int BLACK       = 0xFF000000;
+    public static final int DKGRAY      = 0xFF444444;
+    public static final int GRAY        = 0xFF888888;
+    public static final int LTGRAY      = 0xFFCCCCCC;
+    public static final int WHITE       = 0xFFFFFFFF;
+    public static final int RED         = 0xFFFF0000;
+    public static final int GREEN       = 0xFF00FF00;
+    public static final int BLUE        = 0xFF0000FF;
+    public static final int YELLOW      = 0xFFFFFF00;
+    public static final int CYAN        = 0xFF00FFFF;
+    public static final int MAGENTA     = 0xFFFF00FF;
     public static final int TRANSPARENT = 0;
-
+    
     private static final HashMap<String, Integer> sColorNameMap;
 
     static {
@@ -97,5 +86,6 @@ public final class Color {
         sColorNameMap.put("purple", 0xFF800080);
         sColorNameMap.put("silver", 0xFFC0C0C0);
         sColorNameMap.put("teal", 0xFF008080);
+
     }
 }

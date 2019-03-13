@@ -1,67 +1,69 @@
 package com.macrokeys.comunication;
-
 import java.io.IOException;
 
-/**
- * Interface that allows you to communicate via messages.
- * <p>Allows you to set the timeout for the communication.
- * Timeouts are counted only for the execution of a read:
- * {@link #receiveMessage()}. <br / >
- * The purpose of the timeout is to verify that the communication channel is
- * still active.
- * If the underlying layer (TCP, UDP, Bluetooth, ...) will automatically detect the
- * connection is lost, the implementation can fail to implement the
- * feature timeout.
+/** 
+ * Interfaccia che consente di comunicare tramite messaggi.
+ * <p>Consente anche di impostare dei timeout per la comunicazione.
+ * I timeout vengono contati solamente all'esecuzione di una lettura:
+ * {@link #receiveMessage()}. <br>
+ * Lo scopo del timeout è quello di verificare che il canale di comunicazione sia
+ * ancora attivo.
+ * Se lo strato sottostante (TCP, UDP, Bluetooth, ...) rileva automaticamente la
+ * caduta della connessione l'implementazione può fare a meno di implementare le
+ * feature di timeout.
  * </p>
  */
 public interface MessageProtocol {
-
-    /**
-     * @return True if the connection is active and working, False otherwise.
-     */
-    boolean isConnected();
-
-    /**
-     * Sets the timeout for the stream of input data.
-     * This control is performed only during a
-     * call to {@link #receiveMessage()}.
-     * @param time Time of the timeout, in milliseconds
-     */
-    void setInputKeepAlive(int time);
-
-    /**
-     * @return the Timeout for the stream of input data
-     */
-    int getInputKeepAlive();
-
-    /**
-     * Sets the timeout of the data stream in output
-     * @param time Time of the timeout, in milliseconds
-     */
-    void setOutputKeepAlive(int time);
-
-    /**
-     * @return the Timeout for the flow of data in the output
-     */
-    int getOutputKeepAlive();
-
-    /**
-     * Send a message. Synchronous call
-     * @param payload the Content of the message, even empty
-     * @throws IOException If there is an IO error
-     */
-    void sendMessage(byte[] payload) throws IOException;
-
-    /**
-     * Awaits the receipt of a message
-     * @return Peyload of the message
-     * @throws IOException If there is an IO error
-     */
-    byte[] receiveMessage() throws IOException;
-
-    /**
-     * Closes the connection and terminates the transmission
-     * @throws IOException In case of error
-     */
-    void close() throws IOException;
+	
+	/**
+	 * @return True se la connessione è attiva e funzionante, False altrimenti.
+	 */
+	boolean isConnected();
+	
+	/**
+	 * Imposta il timeout per il flusso di dati in input.
+	 * Questo controllo viene effettuato solamente durante una
+	 * chiamata a {@link #receiveMessage()}.
+	 * @param time Tempo del timeout in millisecondi; 0 per disabilitarlo
+	 * @throws IllegalArgumentException Se {@code time} è < 0
+	 */
+	void setInputKeepAlive(int time);
+	
+	/**
+	 * @return Timeout per il flusso di dati in input; 0 se non impostato.
+	 */
+	int getInputKeepAlive();
+	
+	/**
+	 * Imposta il timeout del flusso di dati in output
+	 * @param time Tempo del timeout in millisecondi; 0 per disabilitarlo
+	 * @throws IllegalArgumentException Se {@code time} è < 0
+	 */
+	void setOutputKeepAlive(int time);
+	
+	/**
+	 * @return Timeout per il flusso di dati in output; 0 se non impostato.
+	 */
+	int getOutputKeepAlive();
+	
+	/**
+	 * Invia un messaggio. Chiamata sincrona
+	 * @param payload Contenuto del messaggio, anche vuoto
+	 * @throws IOException Se c'è un errore di IO
+	 */
+	void sendMessage(byte[] payload) throws IOException;
+	
+	/**
+	 * Aspetta la ricezione di un messaggio
+	 * @return Peyload del messaggio
+	 * @throws IOException Se c'è un errore di IO
+	 */
+	byte[] receiveMessage() throws IOException;
+	
+	
+	/**
+	 * Chiude la connessione e termina la trasmissione
+	 * @throws IOException In caso di errore
+	 */
+	void close() throws IOException;
 }

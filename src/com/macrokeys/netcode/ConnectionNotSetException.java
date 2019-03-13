@@ -7,15 +7,16 @@ import java.io.Serializable;
  */
 public class ConnectionNotSetException extends RuntimeException {
 
-    /**
-     * Serial for {@link Serializable}
-     */
-    private static final long serialVersionUID = 1L;
+	/** Serial for {@link Serializable} */
+	private static final long serialVersionUID = 1L;
 
-    public ConnectionNotSetException() {
+	public ConnectionNotSetException() {
+
     }
 
     public ConnectionNotSetException(String Message) {
         super(Message);
     }
+
 }
+
