@@ -82,50 +82,6 @@ public class MacroNetClient extends MacroClient {
         if(timeout <= 0) {
             throw new IllegalArgumentException("Parameter timeout must be > 0");
         }
-
-        /*
-        MulticastSocket mulSock = new MulticastSocket();
-        InetAddress group = InetAddress.getByName(NetStatic.MULTICAST_ADDR);
-        mulSock.joinGroup(group);
-        DatagramPacket sendPacket = new DatagramPacket(NetStatic.SSDP_CLIENT_KEY, NetStatic.SSDP_CLIENT_KEY.length,
-                group, port);
-        mulSock.send(sendPacket);
-
-        byte[] receve = new byte[NetStatic.SSDP_SERVER_KEY.length + NetStatic.SSDP_NAME_LENGTH];
-        DatagramPacket receivePacket;
-        mulSock.setSoTimeout(timeout);
-
-        ArrayList<SSDPServerInfo> serversInfo = new ArrayList<>();
-        try {
-            while (!mulSock.isClosed()) {
-                receivePacket = new DatagramPacket(receve, receve.length);
-                mulSock.receive(receivePacket);
-                //Estraggo dai dati ricevuti la chiave del Server:
-                byte[] recivedKey = new byte[NetStatic.SSDP_SERVER_KEY.length];
-                System.arraycopy(receve, 0, recivedKey, 0, recivedKey.length);
-                if (Arrays.equals(NetStatic.SSDP_SERVER_KEY, recivedKey)) { //Confronto la chiave inviata dal Server
-                    SocketAddress address = receivePacket.getSocketAddress();
-
-                    //Estraggo dai dati ricevuti il nome del server:
-                    byte[] recivedName = new byte[NetStatic.SSDP_NAME_LENGTH];
-                    System.arraycopy(receve, NetStatic.SSDP_SERVER_KEY.length, recivedName, 0, recivedName.length);
-                    String serverName = new String(recivedName);
-
-                    serversInfo.add(new SSDPServerInfo(address, serverName));
-                }
-            }
-        } catch (SocketTimeoutException e) {
-            //L'eccezione viene sempre generata e il metodo continua
-            
-        }
-
-
-        mulSock.close();
-
-        //To array
-        SSDPServerInfo[] arr = new SSDPServerInfo[serversInfo.size()];
-        return serversInfo.toArray(arr);
-        */
         
         DatagramSocket clientSocket = new DatagramSocket();
         InetAddress brodcast = InetAddress.getByName(NetStatic.BRODCAST_ADDR);

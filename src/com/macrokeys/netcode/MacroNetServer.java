@@ -105,42 +105,6 @@ public final class MacroNetServer extends MacroServer {
 				udpSocket.close();
 			}
 		}
-		
-		/*
-		//Compongo il messaggio di risposta per i client
-		final byte[] sendData = new byte[NetStatic.SSDP_SERVER_KEY.length 
-		                                 + NetStatic.SSDP_NAME_LENGTH];
-		final byte[] serverNameBytes = stringToByteWithEnding(serverName);
-		// Chiave di identificazione lato server
-		System.arraycopy(NetStatic.SSDP_SERVER_KEY, 0, sendData, 0, NetStatic.SSDP_SERVER_KEY.length);
-		// In caso il nome del server sia troppo lungo lo tronco
-		int nameLength = Math.min(serverNameBytes.length, NetStatic.SSDP_NAME_LENGTH);
-		// Nome del server
-		System.arraycopy(serverNameBytes, 0, sendData, NetStatic.SSDP_SERVER_KEY.length, nameLength);
-
-		multicastSocket = null;
-		try {
-			int localPort = socket.getLocalPort();
-			multicastSocket = new MulticastSocket(localPort);
-			InetAddress group = InetAddress.getByName(NetStatic.MULTICAST_ADDR);
-			multicastSocket.joinGroup(group);
-			while (!socket.isClosed()) {
-				byte[] data = new byte[NetStatic.SSDP_CLIENT_KEY.length];
-				DatagramPacket receve = new DatagramPacket(data, data.length);
-				multicastSocket.receive(receve);
-				SocketAddress client = receve.getSocketAddress();
-				// Controllo che è il client per l'applicazione
-				if (Arrays.equals(receve.getData(), NetStatic.SSDP_CLIENT_KEY)) {
-					DatagramPacket send = new DatagramPacket(sendData, sendData.length, client);
-					multicastSocket.send(send);
-				}
-			}
-			multicastSocket.leaveGroup(group);
-		} catch (IOException e) {
-
-		} finally {
-			multicastSocket.close();
-		}*/
 	}
 
 
