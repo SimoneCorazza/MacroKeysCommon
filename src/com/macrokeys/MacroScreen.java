@@ -50,7 +50,7 @@ public final class MacroScreen implements Cloneable, Serializable {
     }
     
     /**
-     * Render this at screen
+     * Render {@code this} at screen
      * @param r Rendering object
      * @param s Screen where to render
      * @param drawArea Area where to render
@@ -78,7 +78,7 @@ public final class MacroScreen implements Cloneable, Serializable {
         	int border;
         	int fill;
         	
-            // CHeck if key was pressed (instance compare)
+            // Check if key was pressed (instance compare)
             if(contains(k, keyPress)) {
                 border = k.getColorEdgePress();
                 fill = k.getColorFillPress();

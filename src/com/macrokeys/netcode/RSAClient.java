@@ -7,41 +7,48 @@ import java.security.PublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Objects;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-/** Permette di criptare messaggi con la crittografia RSA */
+import org.eclipse.jdt.annotation.NonNull;
+
+/** Class to encrypt messages with RSA */
 public final class RSAClient {
 
-    /** Chiave pubblica tramite la quale criptare i messaggi */
+    /** Pubblic key */
     private PublicKey publicKey;
 
-    /** Per criptare */
+    /** Cifer RSA */
     private Cipher cEnc;
 
     /**
-     * @param k Chiave pubblica con la quale criptare
-     * @exception InvalidKeyException - Se la chaive è invalida
+     * @param k Pubblic key
+     * @exception InvalidKeyException If the key is invalid
      */
-    public RSAClient(PublicKey k) {
+    public RSAClient(@NonNull PublicKey k) {
+    	Objects.requireNonNull(k);
+    	
         try {
             publicKey = k;
             cEnc = Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
             cEnc.init(Cipher.ENCRYPT_MODE, publicKey);
         } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException e) {
-            if (!false) throw new AssertionError("Algorithm must be present");
+            throw new AssertionError("Algorithm must be present");
         }
     }
 
     /**
-     * Cripta la sequenza di dati
-     * @param data Dati da criptare
-     * @return Dati criptati
+     * Crypt the given data
+     * @param data Data to crypt
+     * @return Encrypted data
      */
-    public byte[] encript(byte[] data) {
+    public byte[] encript(@NonNull byte[] data) {
+    	Objects.requireNonNull(data);
+    	
         try {
             byte[] cipherData = cEnc.doFinal(data);
             return cipherData;
@@ -51,18 +58,20 @@ public final class RSAClient {
     }
 
     /**
-     * @return Chiave pubblica
+     * @return Public key
      */
     public PublicKey getPublicKey() {
         return publicKey;
     }
 
     /**
-     * Converte una sequenza di byte nella rispettiva chiave pubblica
-     * @param b Sequenza da convertire
-     * @return Chiave pubblica
+     * Converts a byte array in their respective pubblic key
+     * @param b Byte sequence
+     * @return Public key
      */
-    public static PublicKey byteToPublicKey(byte[] b) {
+    public static PublicKey byteToPublicKey(@NonNull byte[] b) {
+    	Objects.requireNonNull(b);
+    	
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(b);

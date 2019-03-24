@@ -1,6 +1,6 @@
 package com.macrokeys.rendering;
 
-/** Modo di rendering */
+/** Rendering method */
 public enum PaintStyle {
 	Fill,
 	Stroke,

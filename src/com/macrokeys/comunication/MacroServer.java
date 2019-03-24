@@ -13,68 +13,69 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.macrokeys.MacroKey;
 import com.macrokeys.MacroKeyType;
 import com.macrokeys.LimitedKeySequence;
 import com.macrokeys.MacroSetup;
 
 /**
- * Classe astratta per un server che invia le {@link MacroSetup} ai {@link MacroClient} e ne riceve i
- * {@link MacroKey} premuti
+ * Abstract class for a server that sends {@link MacroSetup} at the {@link MacroClient}
+ * and receive from them the pressed {@link MacroKey}
  */
 public abstract class MacroServer {
 	
-	/** Attuatore delle pressioni */
+	/** Actuator of the keystrokes */
 	private final KeyPresser keyPresser;
 	
-	/** Listeners agli eventi di {@code this}; mai null */
+	/** Listener for the event of {@code this}; never null */
 	private final List<EventListener> eventListeners = new ArrayList<>();
 	
 	
-	/** {@link MacroKey} attualmente premuti (key down) */
+	/** {@link MacroKey} currently pressed (key down) */
 	private final HashMap<MacroKey, KeyDown> pressedKeys = new HashMap<>();
 	
-	/** Thread per la pressione dei tasti di tipologia {@link MacroKeyType#Normal} */
+	/** Thread for the pression of {@link MacroKeyType#Normal} keys */
 	private final Thread normalPresser = new Thread(new ThreadRunnable());
 	
-	/** Indica se il server è in modalità sospensione */
+	/** Flag for the suspended mode of the server */
 	private boolean suspend = false;
 	
-	/** Setup attualmente utilizzata; mai null */
+	/** Setup currently used; never null */
 	private MacroSetup setup;
 	
 	/** 
-	 * Dati rappresentanti la {@link MacroSetup} attualmente utilizzata,
-	 * reperibile con {@link #setup}; mai null
+	 * Data rapresenting the {@link MacroSetup} currently used,
+	 * get from {@link #setup}; never null
 	 */
 	private byte[] macroSetupData;
 	
 	
 	
 	
-	/** Thread che accoglie le nuove connessioni da parte dei client */
+	/** Thread to welcome the new connection from clients */
 	private Thread threadListener;
-	/** Thread che informa i client del servizio offerto dal server */
+	
+	/** Thread to inform the clients of the service of this server */
 	private Thread threadIntroduce;
 	
 	/** 
-	 * Raccolta dei client connessi; la chiave è l'identificativo a
-	 * stringa dei client
+	 * Clients currently connected; the key of the dictionary is the id of the client
 	 */
 	private final ConcurrentHashMap<String, ClientInfo> clients =
 			new ConcurrentHashMap<>();
 	
 	
-	/** Stato attuale del server */
+	/** Current state of the server */
 	private State state = State.WaitStart;
 	
 	
 	/**
-	 * @param setup Setup da utilizzare inizialmente; non null
-	 * @throws AWTException Se c'è un problema con l'inizializzazione di {@link Robot}
-	 * @throws NullPointerException Se {@code setup} è null
+	 * @param setup Initial setup
+	 * @throws AWTException In case of error whili initializing an instance of {@link Robot}
 	 */
-	public MacroServer(MacroSetup setup) throws AWTException {
+	public MacroServer(@NonNull MacroSetup setup) throws AWTException {
 		Objects.requireNonNull(setup);
 		
 		this.setup = setup;
@@ -89,9 +90,7 @@ public abstract class MacroServer {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		//Interrompo il thread per le pressioni
 		normalPresser.interrupt();
-		//Rilascio tutti i tasti premuti 
 		for(MacroKey k : pressedKeys.keySet()) {
 			releaseKey(k);
 		}
@@ -101,9 +100,9 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Fa partire il server
-	 * @throws IOException In caso di un errore di IO nell'inizializzazione
-	 * @throws IllegalStateException Se this non si trova nello stato
+	 * Start the server
+	 * @throws IOException In case of IO error
+	 * @throws IllegalStateException If {@code this} is not in the state
 	 * {@link State#WaitStart}
 	 * @see #getState()
 	 */
@@ -138,15 +137,15 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Inizializza il server, mettendolo in ascolto dei client
-	 * @throws IOException In caso di un errore di IO nell'inizializzazione
+	 * Init the server; the server start to listen to the incoming client requests
+	 * @throws IOException In case of an IO error
 	 */
 	protected abstract void innerStart() throws IOException;
 	
 	
 	
 	/**
-	 * @return Stato corrente del server
+	 * @return Current state of the server
 	 */
 	public final State getState() {
 		return state;
@@ -155,10 +154,9 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Permette ai client di sapere che questa machina offre il
-	 * servizio di Server.
+	 * Informs the client that this machine offer this serive
 	 * <p>
-	 * Eseguito su un thread separato apposito.
+	 * Executent in a dedicated thread
 	 * </p>
 	 */
 	protected abstract void introduceServerToClient();
@@ -167,9 +165,9 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Permette di attendere nuovi client che si connettino.
+	 * Waits new client's connections
 	 * <p>
-	 * Eseguito sul thread {@link #threadListener}
+	 * Executed in the thread {@link #threadListener}
 	 * </p>
 	 */
 	private void newClientListener() {
@@ -183,7 +181,6 @@ public abstract class MacroServer {
 			}
 			
 			
-			// Se il server non cerca connessioni la chiudo
 			if(!isSeekConnection()) {
 				try {
 					messProt.close();
@@ -192,12 +189,10 @@ public abstract class MacroServer {
 				}
 			}
 			
-			// Imposto il timeout per la comunicazione
+			// Set timeout for the comunication
 			messProt.setInputKeepAlive(ComunicationParameters.TIMEOUT_MESSAGES);
 			messProt.setOutputKeepAlive(ComunicationParameters.TIMEOUT_MESSAGES);
 				
-			// Eseguo il login del client ed ottengo l'identificativo del
-			// client
 			String clientId;
 			try {
 				clientId = loginClient(messProt);
@@ -205,7 +200,7 @@ public abstract class MacroServer {
 				continue;
 			}
 			
-			// In caso il client sia già loggato
+			// Client already logged-in
 			if(clients.containsKey(clientId)) {
 				continue;
 			}
@@ -213,7 +208,7 @@ public abstract class MacroServer {
 			final ClientInfo info = new ClientInfo(clientId, messProt);
 			clients.put(clientId, info);
 			
-			// Faccio partire il thread per servire il client
+			// Server thread for the client
 			Thread th = new Thread() {
 				@Override
 				public void run() {
@@ -222,10 +217,8 @@ public abstract class MacroServer {
 			};
 			th.start();
 			
-			
-			// Genero l'evento della connessione di un nuovo client
-			// in maniera da non appesantire questo thread ed evitare
-			// che venga interroto a causa di eccezioni
+			// Fire the event for the new connection of a client.
+			// Done it in a separate thread to relieve this thread and avoid interruption caused by exceptions.
 			Thread startEvents = new Thread() {
 				@Override
 				public void run() {
@@ -239,12 +232,12 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Server il cleint indicato. In particolare gestisce le eccezioni
-	 * di {@link #ServeClientExceptions(ClientInfo)}
-	 * @param info 
+	 * Serve the given client. In particular it handles the exceptions
+	 * of {@link #ServeClientExceptions(ClientInfo)}
+	 * @param info The client to serve
 	 * @see #ServeClientExceptions(ClientInfo)
 	 */
-	private void serveClient(ClientInfo info) {		
+	private void serveClient(@NonNull ClientInfo info) {		
 		try {
 			serveClientExceptions(info);
 		} catch (IOException e) {
@@ -276,34 +269,35 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Esegue il login del client
-	 * @param messProt Livello di comunicazione a messaggi con il client
-	 * @return Identificativo del client
+	 * Login for the client
+	 * @param messProt Comunication layer with the client
+	 * @return Id of the client
+	 * @throws IOException In case of IO error
 	 */
 	private String loginClient(MessageProtocol messProt) throws IOException {
-		// TODO: implementare sicurezza ed identificazione del cleint
+		// TODO: identify the client and implement securety
 		return messProt.toString();
 	}
 
 	/**
-	 * Gestisce l'input del client indicato
-	 * @param info Informazioni relative al client da gestire
-	 * @throws IOException In caso di errore IO
+	 * Handles the input of the given client
+	 * @param info Client to handle
+	 * @throws IOException In case of IO error
 	 */
-	private void serveClientExceptions(ClientInfo info)
+	private void serveClientExceptions(@NonNull ClientInfo info)
 			throws IOException {
 		assert info != null;
 		assert getMacroSetup() != null;
 		
 		
-		// Invio la macro setup
+		// Send the macro setup
 		byte[] macroSetupData = getMacroSetupData();
 		assert macroSetupData != null;
 		info.messProt.sendMessage(macroSetupData);
 		
 		
 		
-		//Ricevo le richieste di effettuare macro
+		// Receive the request from the client
 		while(info.messProt.isConnected()) {
 			byte[] mess = info.messProt.receiveMessage();
 			ByteArrayInputStream str = new ByteArrayInputStream(mess);
@@ -334,17 +328,18 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Attende la connessione di un nuovo client.
-	 * @return Livello di comunicazione a messaggi con il nuovo client
+	 * Wait a connection of a client
+	 * @return Comunication layer with the newly connected client
 	 */
 	protected abstract MessageProtocol waitNewClientConnection() throws IOException;
 	
 	
 	
 	/**
-	 * Setta il flag che indica se il Server eseguirà le macro ricevute
-	 * @param s Nuovo stato del flag
-	 * @throws IllegalStateException Se this non si trova nello stato
+	 * Sets the flag of the suspension of the server. The macro sent by the client
+	 * are not executed if true
+	 * @param s Flag
+	 * @throws IllegalStateException If {@code this} is not in the state
 	 * {@link State#Functional}
 	 * @see #getState()
 	 */
@@ -357,7 +352,6 @@ public abstract class MacroServer {
 			suspend = s;
 			
 			if(suspend) {
-				//Rilascio tutti i tasti premuti 
 				for(MacroKey k : pressedKeys.keySet()) {
 					releaseKey(k);
 				}
@@ -371,7 +365,7 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * @return True se il Server non esegue più le pressioni delle macro ricevute
+	 * @return True if the server does not execute the given macros from the client, false otherwise
 	 */
 	public final boolean isSuspended() {
 		return suspend;
@@ -381,7 +375,7 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * @return True se il Server accetta nuove connessioni
+	 * @return True if the server excepts new connections from clients, false otherwise
 	 */
 	public abstract boolean isSeekConnection();
 	
@@ -389,16 +383,17 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Setta il flag che indica se il Server accetta nuove connessioni
-	 * @param b Nuovo stato del flag
+	 * Sets the flag that indicates if the server accept new incomming connections
+	 * @param b The state of the new flag
 	 */
 	public abstract void setSeekConnection(boolean b);
 	
 	
 	
 	/** 
-	 * Chiude il server interrompendone l'attività e cambiandone lo stato.
-	 * @throws IllegalStateException Se this non si trova nello stato {@link State#Functional}
+	 * Close the server interrupting his activity.
+	 * The state changes to {@link State#Closed} if this method not throws.
+	 * @throws IllegalStateException If {@code this} is not in the state {@link State#Functional}
 	 * @see #getState()
 	 */
 	public final void close() {
@@ -410,7 +405,9 @@ public abstract class MacroServer {
 		for(ClientInfo s : clients.values()) {
 			try {
 				s.messProt.close();
-			} catch (IOException e) { }
+			} catch (IOException e) {
+				// Nothing
+			}
 		}
 		
 		threadIntroduce.interrupt();
@@ -425,20 +422,19 @@ public abstract class MacroServer {
 	}
 	
 	/**
-	 * Implementa la chiusura del server.
-	 * Chiamato da {@link #close()}
+	 * Implements the close of the server
+	 * Called by {@link #close()}
 	 */
 	protected abstract void innerClose();
 	
 	
 	
 	/**
-	 * Permette di cambiare la {@link MacroSetup} attuale
-	 * <p>Metodo sincrono; meglio non eseguire sul thread dell'UI</p>
-	 * @param m Nuova setup da utilizzare; non null
-	 * @throws NullPointerException Se {@code m} è null
+	 * Change the actual {@link MacroSetup}
+	 * <p>Syncronous method; better not call this on the UI thread</p>
+	 * @param m New {@link MacroSetup} to use
 	 */
-	public final void changeMacroSetup(MacroSetup m) {
+	public final void changeMacroSetup(@NonNull MacroSetup m) {
 		Objects.requireNonNull(m);
 		assert setup != null;
 		
@@ -451,14 +447,13 @@ public abstract class MacroServer {
 		}
 		
 		
-		// Invio ai client la nuova MacroSetup
-		// 
+		// Send to the client the new MacroSetup
 		byte[] macroSetupData = getMacroSetupData();
 		for(ClientInfo p : clients.values()) {
 			try {
 				p.messProt.sendMessage(macroSetupData);
 			} catch(IOException e) {
-				// Niente
+				// Nothing
 			}
 		}
 
@@ -469,41 +464,39 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * @return Ottiele il setup attualmente utilizzato
+	 * @return Actual used {@link MacroSetup}
 	 */
-	public final MacroSetup getMacroSetup() {
+	public final @NonNull MacroSetup getMacroSetup() {
 		return this.setup;
 	}
 	
 	
 	/**
-	 * @return Rappresentazione binaria della {@link MacroSetup} attualmente
-	 * selezionata (ottenibile con {@link #getMacroSetup()})
+	 * @return Binary representation of the {@link MacroSetup} actually selected
+	 * @see #getMacroSetup()
 	 */
-	protected final byte[] getMacroSetupData() {
+	protected final @NonNull byte[] getMacroSetupData() {
 		return macroSetupData;
 	}
 	
 	
 	
 	/**
-	 * Preme il {@link MacroKey} se il flag {@link #isSuspended()} è false
-	 * @param mk Tasto da premere; non null
-	 * @param clientId Identificativo del client che ha premuto il tasto
-	 * @return True se il tasto è stato premuto o il flag{@link #isSuspended()}
-	 * è true. False se il tasto è già stato premuto.
+	 * Press the {@link MacroKey} if the flag {@link #isSuspended()} is false
+	 * @param mk Key to press
+	 * @param clientId Id of the client that pressed the key
+	 * @return True if the key was pressed or the flag {@link #isSuspended()}
+	 * is true. False if the key was already pressed.
 	 */
-	private boolean pressKey(MacroKey mk, String clientId) {
+	private boolean pressKey(@NonNull MacroKey mk, String clientId) {
 		assert mk != null;
 		assert clients.containsKey(clientId);
 		assert getState().equals(State.Functional);
 		
-		// Se sospeso o già premuto ignoro la pressione
+		// If suspended or already pressed i ignore the press
 		if(suspend || pressedKeys.containsKey(mk)) {
 			return false;
 		}
-		
-		// Controllo che non sia già stato premuto
 		
 		switch(mk.getType()) {
 		case Game:
@@ -519,7 +512,7 @@ public abstract class MacroServer {
 			
 		}
 		
-		//Indico il tasto come premuto
+		// Mark the key as pressed
 		pressedKeys.put(mk, new KeyDown(clientId, mk.getType()));
 		
 		fireKeyRecivedListener(clientId, mk, true);
@@ -530,13 +523,12 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Rilascia il {@link MacroKey}.
-	 * Non influenzato dal flag {@link #isSuspended()}.
-	 * @param mk Tasto da rilasciare; non null
-	 * @return True se il tasto è stato rilasciato.
-	 * 	False se il tasto è già stato rilasciato.
+	 * Release the {@link MacroKey} regardless of the flag {@link #isSuspended()}.
+	 * @param mk Key to release
+	 * @return True if the key was released
+	 * 	False if the key was not pressed.
 	 */
-	protected boolean releaseKey(MacroKey mk) {
+	protected boolean releaseKey(@NonNull MacroKey mk) {
 		assert mk != null;
 		assert getState().equals(State.Functional);
 		
@@ -558,11 +550,10 @@ public abstract class MacroServer {
 	}
 	
 	/**
-	 * Preme e rilascia il {@link MacroKey}.
-	 * Non influenzato dal flag {@link #suspend}.
-	 * @param mk Tasto su cui effettuare l'azione; non null
+	 * Press and release the {@link MacroKey} regardless of the flag {@link #isSuspended()}.
+	 * @param mk Key to press
 	 */
-	private void pressAndReleaseKey(MacroKey mk) {
+	private void pressAndReleaseKey(@NonNull MacroKey mk) {
 		assert mk != null;
 		assert getState().equals(State.Functional);
 		
@@ -577,7 +568,7 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Informazioni relative ad un client attualmente connesso
+	 * Information about a client connected to the server
 	 */
 	private final static class ClientInfo {
 		private final String clientId;
@@ -585,13 +576,12 @@ public abstract class MacroServer {
 		
 		
 		/**
-		 * @param clientId Identificativo del client
-		 * @param p Strato di comunicazione con il client a messaggi
+		 * @param clientId Id of the client
+		 * @param p Comunication layer with the client
 		 */
-		public ClientInfo(String clientId, MessageProtocol p) {
-			if(clientId == null || p == null) {
-				throw new NullPointerException();
-			}
+		public ClientInfo(@NonNull String clientId, @NonNull MessageProtocol p) {
+			Objects.requireNonNull(clientId);
+			Objects.requireNonNull(p);
 			
 			this.clientId = clientId;
 			this.messProt = p;
@@ -600,17 +590,18 @@ public abstract class MacroServer {
 	
 	
 	
-	// --- THREAD PER PRESSIONI NORMALI ---
-	
+	/** Thread for normal pressions */
 	private class ThreadRunnable implements Runnable {
-    	/** Tempo da aspettare in ms prima di considerare una pressione prolungata su un tasto
-         * come delle pressioni */
+    	/** Time to wait in ms before repeating a key press of a pressed key */
         final static int KEY_REPEAT_WAIT = 750;
-        /** Numero di keystroke inviati al secondo  */
+        
+        /** Frequency of keystroke to send */
         final static int KEY_FREQ = 30;
-        /** Periodo di attesa (in ms) prima di riconoscere la peressione consecutiva per un tasto */
+        
+        /** Period of wait (in ms) before recognizing a pression as multiple keystroke */
         final static int KEY_SLEEP = 1000 / KEY_FREQ;
-        /** Tempo di riposo del tread tra una passata dei tasti e l'altra */
+        
+        /** Sleep time between one keypress loop and the next */
         final int FREE_TIME = Math.max(1, Math.min(KEY_REPEAT_WAIT, KEY_SLEEP) / 2);
 
         @Override
@@ -632,18 +623,19 @@ public abstract class MacroServer {
 						long d = System.currentTimeMillis() - u.lastDownTime;
 						assert d >= 0;
 						
-						//Non è stato premuto per la prima volta
 						if(!u.firstDown) {
 							u.firstDown = true;
 							u.lastDownTime = System.currentTimeMillis();
 							pressAndReleaseKey(k);
-							//E' stato premuto per la prima volta, aspetto prima di ripetere la pressione
 						} else if(!u.firsPressOccurred && d >= KEY_REPEAT_WAIT) {
+							// It was pressed for the first time: waiting before repeating the pressure
+							
 							u.firsPressOccurred = true;
 							u.lastDownTime = System.currentTimeMillis();
 							pressAndReleaseKey(k);
-							//Aspetto per le pressioni successive
 						} else if(u.firsPressOccurred && d >= KEY_SLEEP) {
+							// Wating for the following pressures
+							
 							u.lastDownTime = System.currentTimeMillis();
 							pressAndReleaseKey(k);
 						}
@@ -655,19 +647,19 @@ public abstract class MacroServer {
 	
     private class KeyDown {
     	
-    	/** Identificativo del client che ha premuto il tasto */
+    	/** Id of the client that pressed the key */
     	private String clientId;
     	
-    	/** Tipologia di pressione associata */
+    	/** Pressure type */
     	private MacroKeyType type;
     	
     	/**
-    	 Istante di tempo in millisecondi, nel quale la richiesta
-    	 di pressione è stata fatta
+    	 Timestamp where the request was made
     	 */
     	private long lastDownTime = 0;
+    	
     	/**
-    	 * True: indica se il tasto è stato già premuto per la prima volta
+    	 * True: indicates that the key was already pressed for the first time
     	 */
     	private boolean firstDown = false;
     	
@@ -684,11 +676,10 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Aggiunge un listener per il compimento di un'azione
-	 * @param l Listener da aggiungere
-	 * @throws NullPointerException Se {@code l} è null
+	 * Add a listener for the completition of an action
+	 * @param l Listener to add
 	 */
-	public final void addEventListener(EventListener l) {
+	public final void addEventListener(@NonNull EventListener l) {
 		Objects.requireNonNull(l);
 		
 		synchronized (eventListeners) {
@@ -697,11 +688,10 @@ public abstract class MacroServer {
 	}
 	
 	/**
-	 * Rimuove tutte le istanze del listener indicato
-	 * @param l Listener da rimuovere
-	 * @throws NullPointerException Se {@code l} è null
+	 * Remove the listener instances for the action event
+	 * @param l instance of listener to remove
 	 */
-	public final void removeEventListener(EventListener l) {
+	public final void removeEventListener(@NonNull EventListener l) {
 		Objects.requireNonNull(l);
 		
 		synchronized (eventListeners) {
@@ -713,11 +703,11 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Rimuove tutte le istanze di {@code instance} in {@code list}
-	 * @param list Lista dalla quale rimuovere le istanze; non null
-	 * @param instance Istanza da rimuovere
+	 * Remove all instnces of {@code instance} in {@code list}
+	 * @param list List where remove the instance
+	 * @param instance Instance to remove
 	 */
-	private static <T> void removeInstanceOf(List<T> list, T instance) {
+	private static <T> void removeInstanceOf(@NonNull List<T> list, T instance) {
 		assert list != null;
 		
 		Iterator<T> it = list.iterator();
@@ -731,13 +721,13 @@ public abstract class MacroServer {
 	
 	
 	/** 
-	 * Genera l'evento di tasto premuto o rilasciato
-	 * @param source Identificativo del client che ha inviato l'azione; non null
-	 * @param mk Tasto premuto o rilasciato; non null
-	 * @param action True: pressione; False rilascio
+	 * Generates the event of key pressed or released
+	 * @param source Id of the client that sent the action
+	 * @param mk Key subject of the action
+	 * @param action True: pression; False release
 	 */
-	private void fireKeyRecivedListener(String source,
-			MacroKey mk, boolean action) {
+	private void fireKeyRecivedListener(@NonNull String source,
+			@NonNull MacroKey mk, boolean action) {
 		assert source != null;
 		assert mk != null;
 		
@@ -752,10 +742,10 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Genera l'evento di connessione da parte di un client
-	 * @param s Identificativo del client connesso; non null
+	 * Generate a connection event of a client
+	 * @param s Id of the connected client
 	 */
-	private void fireClientConnectListener(String s) {
+	private void fireClientConnectListener(@NonNull String s) {
 		assert s != null;
 		
 		synchronized (eventListeners) {
@@ -769,10 +759,10 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Genera l'evento di connessione da parte di un client
-	 * @param s Identificativo del cleint; non null
+	 * Generate a disconnection event of a client
+	 * @param s Id of the disconnected client
 	 */
-	private void fireClientDisconnectListener(String s) {
+	private void fireClientDisconnectListener(@NonNull String s) {
 		assert s != null;
 		
 		synchronized (eventListeners) {
@@ -785,7 +775,7 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Genera l'evento di chiusura del server
+	 * Generates the event of closure of the server
 	 */
 	private void fireServerCloseEvent() {
 		synchronized(eventListeners) {
@@ -798,8 +788,8 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Genera l'evento di cambio dello stato di sospensione del server
-	 * @param newState Nuovo stato di sospensione
+	 * Generates the event of a change in the suspension state of this server
+	 * @param newState New state of suspension
 	 */
 	private void fireServerSuspendEvent(boolean newState) {
 		synchronized(eventListeners) {
@@ -812,8 +802,8 @@ public abstract class MacroServer {
 	
 	
 	/**
-	 * Genera l'evento di cambiamento della {@link MacroSetup}
-	 * @param actual Nuova {@link MacroSetup} utilizzata, null se nessuna
+	 * Generates the event of change of {@link MacroSetup}
+	 * @param actual New {@link MacroSetup} used; null if none
 	 */
 	private void fireServerChangeMacroSetup(MacroSetup actual) {		
 		synchronized(eventListeners) {
@@ -826,67 +816,66 @@ public abstract class MacroServer {
 
 
 	/**
-	 * Listener per eventi associati al server
+	 * Listener for events of the server
 	 */
 	public interface EventListener {
 		/**
-		 * Generato alla ricezione di un tasto
-		 * @param server Istanza del server che ha generato l'evento; non null
-		 * @param sender Identificativo del client mittente
-		 * @param mk Tasto premuto
-		 * @param action True pressione; False rilascio
-		 * @throws NullPointerException Se {@code sender} o {@code k} sono {@code null}
+		 * Generated at the receive of a key
+		 * @param server Instance of the server that generated the event
+		 * @param sender Client sender id
+		 * @param mk Key pressed
+		 * @param action True pression; False release
 		 */
-		void onKeyReceved(MacroServer server, String sender, MacroKey mk, boolean action);
+		void onKeyReceved(@NonNull MacroServer server, @NonNull String sender, @NonNull MacroKey mk, boolean action);
 		
 		/**
-		 * Alla connessione di un nuovo client
-		 * @param server Istanza del server che ha generato l'evento; non null
-		 * @param sender Identificativo del client connesso
-		 * @throws NullPointerException Se {@code s} è null
+		 * Generated at the connection of a new client
+		 * @param server Instance of the server that generated the event
+		 * @param sender Id of the newly connected client
 		 */
-		void onConnectListener(MacroServer server, String sender);
+		void onConnectListener(@NonNull MacroServer server, @NonNull String sender);
 		
 		/**
-		 * Alla disconnessione di un client
-		 * @param server Istanza del server che ha generato l'evento; non null
-		 * @param sender Identificativo del client disconnesso
-		 * @throws NullPointerException Se {@code s} è null
+		 * Generated at the disconnection of a client
+		 * @param server Instance of the server that generated the event
+		 * @param sender Client sender id
 		 */
-		void onDisconnectListener(MacroServer server, String sender);
+		void onDisconnectListener(@NonNull MacroServer server, @NonNull String sender);
 		
 		/**
-		 * Server chiude la connessione
-		 * @param server Istanza del server che ha generato l'evento; non null
+		 * Generated when the server close the connection
+		 * @param server Instance of the server that generated the event
 		 */
-		void onClose(MacroServer server);
+		void onClose(@NonNull MacroServer server);
 		
 		/**
-		 * Server viene sospeso
-		 * @param server Istanza del server che ha generato l'evento; non null
-		 * @param newState Nuovo stato: True sospeso, False altrimenti
+		 * Generated at the suspension of the server
+		 * @param server Instance of the server that generated the event
+		 * @param newState New state flag: True suspended, False otherwise
 		 */
-		void onSuspendChanged(MacroServer server, boolean newState);
+		void onSuspendChanged(@NonNull MacroServer server, boolean newState);
 		
 		/**
-		 * Server cambia {@link MacroSetup} utilizzata
-		 * @param server Istanza del server che ha generato l'evento; non null
-		 * @param actual Nuova {@link MacroSetup}; null se nessuna
+		 * Generated at the ghange of the {@link MacroSetup} used
+		 * @param server Instance of the server that generated the event
+		 * @param actual New {@link MacroSetup} used; null if none
 		 */
-		void onMacroSetupChanged(MacroServer server, MacroSetup actual);
+		void onMacroSetupChanged(@NonNull MacroServer server, @NonNull MacroSetup actual);
 	}
 	
 	
 	
 	/**
-	 * Stato attuale del server
+	 * Possible state of a server
 	 */
 	public enum State {
-		/** Server aspetta l'avvio tramite metodo {@link MacroServer#start()}*/
+		/** The server waits the init by the method {@link MacroServer#start()} */
 		WaitStart,
-		/** Il server funziona regolarmente */
+		
+		/** The server works */
 		Functional,
-		/** Il server è stato chiuso */
+		
+		/** The server is closed */
 		Closed
 	}
 }

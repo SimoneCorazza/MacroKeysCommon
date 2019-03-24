@@ -15,39 +15,39 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
-/** Gestisce la connessione e la tasmissione dei tasti al {@link MacroNetServer} */
+import org.eclipse.jdt.annotation.NonNull;
+
+/** Handles the connection and the transmission of data at the {@link MacroNetServer} */
 public class MacroNetClient extends MacroClient {
 
-    /** Timeout per la connessione al server */
+    /** Server connection timeout */
     private static final int TIMEOUT_CONNECTION = 10000;
     
-    /** Indirizzo del server */
+    /** Server address */
     private final SocketAddress address;
     
     
     /**
-     * Avvia una nuova connessione verso l'indirizzo indicato
-     * <p>Metodo sincrono; evitare sull'UI thread</p>
-     * @param ip Indirizzo IP del server; non null
-     * @throws IOException Se c'è un errore con la creazione della connessione
-     * @throws IllegalArgumentException Se {@code ip} è null
+     * Init a new connection at the given address
+     * <p>Sincronous method; avoid in the UI thread</p>
+     * @param ip Server IP address
+     * @throws IOException If an IO error occurrs
      */
-    public MacroNetClient(String ip) throws IOException {
+    public MacroNetClient(@NonNull String ip) throws IOException {
     	this(new InetSocketAddress(ip, NetStatic.PORT));
     }
     
     
     /**
-     * Avvia una nuova connessione verso l'indirizzo indicato
-     * <p>Metodo sincrono; evitare sull'UI thread</p>
-     * @param socket Socket alla qualle connettersi; non null
-     * @throws IOException Se c'è un errore con la creazione della connessione
-     * @throws NullPointerException Se {@code ip} è null
-     * @throws IllegalArgumentException Se la porta di {@code socket} è diversa
-     * da quella usata dal protocollo
+     * Init a new connection at the given address
+     * <p>Sincronous method; avoid in the UI thread</p>
+     * @param socket Socket to cennect at
+     * @throws IOException If an IO error occurrs
+     * @throws IllegalArgumentException If the port of {@code socket} is different from witch of the protocol
      */
-    public MacroNetClient(InetSocketAddress socket) throws IOException {
+    public MacroNetClient(@NonNull InetSocketAddress socket) throws IOException {
     	Objects.requireNonNull(socket);
+    	
     	if(socket.getPort() != NetStatic.PORT) {
     		throw new IllegalArgumentException("Wrong port");
     	}
@@ -69,13 +69,13 @@ public class MacroNetClient extends MacroClient {
     
     
     /**
-     * Permette di trovare i server tramite multicast, nella rete locale.
-     * Vengono ottenuti i server che rispondono prima del timeout.
-     * Esegue un solo send per il multicast e l'eccezzione
-     * {@link SocketTimeoutException} è gestita dal metodo
-     * @param timeout Tempo, in millisecondi, da aspettare prima che il metodo finisca; > 0
-     * @return Sequenza di Server scoperti con le relative informazioni
-     * @throws IOException Se c'è un errore di IO
+     * Find the server in the local newtwork.
+     * It ghets the server that respond before the timeout.
+     * The {@link SocketTimeoutException} is handled
+     * @param timeout Time limit to the answars of the server
+     * @return Discovered servers
+     * @throws IOException If an IO error occurrs
+     * @throws IllegalArgumentException If {@code timeout} is <= 0
      * @see <a href="link https://en.wikipedia.org/wiki/Simple_Service_Discovery_Protocol">SSDP protocol port</a>
      */
     public static SSDPServerInfo[] findServer(int timeout) throws IOException {
@@ -142,16 +142,17 @@ public class MacroNetClient extends MacroClient {
             while (!clientSocket.isClosed()) {
             	receivePacket = new DatagramPacket(receve, receve.length);
                 clientSocket.receive(receivePacket);
-                //Estraggo dai dati ricevuti la chiave del Server:
+                
+                // Extract from the data the server key:
                 byte[] recivedKey = new byte[NetStatic.SSDP_SERVER_KEY.length];
                 System.arraycopy(receve, 0, recivedKey, 0, recivedKey.length);
                 
-                //Confronto la chiave inviata dal Server
+                // Check the key sent by the server
                 if (Arrays.equals(NetStatic.SSDP_SERVER_KEY, recivedKey)) {
                 	InetSocketAddress address = (InetSocketAddress)
                 			receivePacket.getSocketAddress();
-
-                    //Estraggo dai dati ricevuti il nome del server:
+                	
+                	// Extract from the data the name of the server:
                     byte[] recivedName = new byte[NetStatic.SSDP_NAME_LENGTH];
                     System.arraycopy(receve, NetStatic.SSDP_SERVER_KEY.length, recivedName, 0, recivedName.length);
                     String serverName = new String(recivedName);
@@ -160,33 +161,32 @@ public class MacroNetClient extends MacroClient {
                 }
             }
         } catch (SocketTimeoutException e) {
-            //L'eccezione viene sempre generata e il metodo continua
-            
+            // This exception is always generated and the method must continue
         }
 
 
         clientSocket.close();
 
-        //To array
+        // To array
         SSDPServerInfo[] arr = new SSDPServerInfo[serversInfo.size()];
         return serversInfo.toArray(arr);
     }
 
  
 
-    /** Classe che memorizza le informazioni di un Server scoperto */
+    /** Info of a discovered server */
     public static class SSDPServerInfo {
-        /** Indirizzo socket per la comunicazione con il Server */
+        /** Socket address to comunicate with the server */
         public final InetSocketAddress address;
-        /** Nome del server */
+        
+        /** Name of the server */
         public final String name;
 
         /**
-         * @param address Socket del server per la comunicazione
-         * @param name Nome del server
-         * @throws NullPointerException Se {@code address} o {@code name} sono null
+         * @param address Socket address to comunicate with the server
+         * @param name name of the server
          */
-        private SSDPServerInfo(InetSocketAddress address, String name) {
+        private SSDPServerInfo(@NonNull InetSocketAddress address, @NonNull String name) {
             assert address != null;
             assert name != null;
             

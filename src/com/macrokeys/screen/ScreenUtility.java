@@ -2,58 +2,56 @@ package com.macrokeys.screen;
 
 import java.util.Objects;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.macrokeys.rendering.RectF;
 
-/** Classe statica per utility relative allo schermo */
+/** Static class for screen utilities */
 public final class ScreenUtility {
 	
 	private ScreenUtility() { }
 	
-    /** 1 pollice in millimetri */
+    /** 1 inch in millimeters */
     private static final float INCH_MM = 25.4f;
 	
     /**
-     * Converte millimetri in pixel per l'asse X
-     * @param mm Millimetri da convertire
-     * @param s Schermo di riferimento
-     * @return Numero di pixel presenti nei millimetri indicati sull'asse X del display ({@code mm)
-     * @throws NullPointerException Se {@code s} è null
+     * Converts millimeters in pixels for the X axis
+     * @param mm Millimeters to convert
+     * @param s Screen to use
+     * @return Conversion result
      */
-    public static float mmtopx_X(float mm, Screen s) {
+    public static float mmtopx_X(float mm, @NonNull Screen s) {
     	Objects.requireNonNull(s);
         return (mm / INCH_MM) * s.getXDpi();
     }
 
     /**
-     * Converte millimetri in pixel per l'asse Y
-     * @param mm Millimetri da convertire
-     * @param s Schermo di riferimento
-     * @return Numero di pixel presenti nei millimetri indicati sull'asse Y del display ({@code mm})
-     * @throws NullPointerException Se {@code s} è null
+     * Converts millimeters in pixels for the Y axis
+     * @param mm Millimeters to convert
+     * @param s Screen to use
+     * @return Conversion result
      */
-    public static float mmtopx_Y(float mm, Screen s) {
+    public static float mmtopx_Y(float mm, @NonNull Screen s) {
     	Objects.requireNonNull(s);
         return (mm / INCH_MM) * s.getYDpi();
     }
     
     /**
-     * Converte pixel in millimetri per l'asse X
-     * @param px Pixel da convertire
-     * @param s Schermo di riferimento
-     * @return Numero di millimetri corspondenti ai pixel dello schermo sull'asse X
-     * @throws NullPointerException Se {@code s} è null
+     * Converts pixels in millimeters for the X axis
+     * @param px Pixels to convert
+     * @param s Screen to use
+     * @return Conversion result
      */
-    public static float pxtomm_X(float px, Screen s) {
+    public static float pxtomm_X(float px, @NonNull Screen s) {
     	Objects.requireNonNull(s);
     	return (px / s.getXDpi()) * INCH_MM;
     }
     
     /**
-     * Converte pixel in millimetri per l'asse Y
-     * @param px Pixel da convertire
-     * @param s Schermo di riferimento
-     * @return Numero di millimetri corspondenti ai pixel dello schermo sull'asse Y
-     * @throws NullPointerException Se {@code s} è null
+     * Converts pixels in millimeters for the Y axis
+     * @param px Pixels to convert
+     * @param s Screen to use
+     * @return Conversion result
      */
     public static float pxtomm_Y(float px, Screen s) {
     	Objects.requireNonNull(s);
@@ -61,13 +59,12 @@ public final class ScreenUtility {
     }
 
     /**
-     * Converte un rettangolo in pixel
-     * @param r Rettangolo in millimetri da convertire in pixel
-     * @param s Schermo al quale adeguare le dimensioni
-     * @return Rettangolo in pixel
-     * @throws NullPointerException Se {@code s} o {@code r} sono null
+     * Converts a rectangle in pixels
+     * @param r Reactangle to convert
+     * @param s Screen to use
+     * @return Rectangle in pixels
      */
-    public static RectF mmtopx(RectF r, Screen s) {
+    public static RectF mmtopx(@NonNull RectF r, @NonNull Screen s) {
     	Objects.requireNonNull(r);
     	Objects.requireNonNull(s);
     	

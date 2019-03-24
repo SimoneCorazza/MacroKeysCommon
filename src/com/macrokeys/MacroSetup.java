@@ -167,14 +167,14 @@ public final class MacroSetup implements Serializable {
     	assert width > 0 && height > 0;
     	assert m != null;
     	
-    	//Trovo gli estremi della schermata
+    	// FInd the max value of the screen
     	float maxX = 0, maxY = 0;
 		for(MacroKey k : m.getKeys()) {
 			maxX = Math.max(k.getArea().right, maxX);
 			maxY = Math.max(k.getArea().bottom, maxY);
 		}
 		
-		//Controllo se è necessario sistemare la schermata
+		// Check if the position of the screen need fixes
 		if(maxX > width || maxY > height) {
     		float max = Math.max(maxX, maxY);
     		float scale = Math.min(width / max, height / max);

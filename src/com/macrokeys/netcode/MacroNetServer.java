@@ -14,40 +14,44 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.macrokeys.MacroSetup;
 import com.macrokeys.comunication.MacroServer;
 import com.macrokeys.comunication.MessageProtocol;
 
-/** Server che esegue le macro inviate da {@link MacroNetClient} */
+/** Seerver that exectues the macro sent by {@link MacroNetClient} */
 public final class MacroNetServer extends MacroServer {
 	
-	/** Charset utilizzato per la comunicazione con il client */
+	/** Charset used for the comunication with the client */
 	public static final Charset CHARSET_CLIENT = StandardCharsets.UTF_8;
     
 	
 	
 	
-	/** Nome del Server (usato per l'identificazione di questo Server quando un client esegue un SSDP) */
+	/** name of the server
+	 * <p>
+	 * Used for the identification of this server when doind the SSDP
+	 */
 	private static final String serverName = serverName();
 	
-	/** Indica se il Server accetta nuove connessioni in arrivo */
+	/** Indicates whether this server accepts new connections */
 	private boolean seekConnection = false;
 	
 	
-	/** Soket del server */
+	/** Server socket */
 	private ServerSocket serverSocket;
 	
-	/** Socket per pacchetti UDP relativi al SSDP */
+	/** UDP socket for the SSDP */
 	private DatagramSocket udpSocket;
 	
 	
 	/**
-	 * @param setup Setup da utilizzare inizialmente; non null
-	 * @throws IOException Se c'è un problema nella creazione del socket del server
-	 * @throws AWTException Se c'è un problema con l'inizializzazione di {@link Robot}
-	 * @throws NullPointerException Se {@code setup} è null
+	 * @param setup initial setap to use
+	 * @throws IOException If an IO error occurs
+	 * @throws AWTException If an error occur while initializing {@link Robot}
 	 */
-	public MacroNetServer(MacroSetup setup)
+	public MacroNetServer(@NonNull MacroSetup setup)
 			throws IOException, AWTException {
 		super(setup);
 	}
@@ -63,15 +67,18 @@ public final class MacroNetServer extends MacroServer {
 	
 	@Override
 	protected void introduceServerToClient() {
-		//Compongo il messaggio di risposta per i client
+		// Creating the message for the client
 		final byte[] sendData = new byte[NetStatic.SSDP_SERVER_KEY.length 
 		                                 + NetStatic.SSDP_NAME_LENGTH];
 		final byte[] serverNameBytes = stringToByteWithEnding(serverName);
-		//Chiave di identificazione lato server
+		
+		// Identification key for the serv er
 		System.arraycopy(NetStatic.SSDP_SERVER_KEY, 0, sendData, 0, NetStatic.SSDP_SERVER_KEY.length);
-		//In caso il nome del server sia troppo lungo lo tronco
+		
+		// If the name of the server is too long is truncated
 		int nameLength = Math.min(serverNameBytes.length, NetStatic.SSDP_NAME_LENGTH);
-		//Nome del server
+		
+		// Name of the server
 		System.arraycopy(serverNameBytes, 0, sendData, NetStatic.SSDP_SERVER_KEY.length, nameLength);
 		
 		int localPort = serverSocket.getLocalPort();
@@ -84,7 +91,8 @@ public final class MacroNetServer extends MacroServer {
 				DatagramPacket receve = new DatagramPacket(data, data.length);
 				udpSocket.receive(receve);
 				SocketAddress client = receve.getSocketAddress();
-				//Controllo che è il client per l'applicazione
+				
+				// CHecks is the application client
 				if(Arrays.equals(receve.getData(), NetStatic.SSDP_CLIENT_KEY)) {
 					DatagramPacket send = new DatagramPacket(sendData, sendData.length, client);
 					udpSocket.send(send);
@@ -149,10 +157,10 @@ public final class MacroNetServer extends MacroServer {
 
 	
 	/**
-	 * Converte la stringa {@code s} in byte (nel formato dato da {@link #CHARSET_CLIENT})
-	 * assicurandosi che la sequenza termini con {@code '\0'}
-	 * @param s Stringa da convertire in byte
-	 * @return Sequenza di byte della stringa terminante con uno 0
+	 * Converts a string in bytes in the format given by {@link #CHARSET_CLIENT}.
+	 * The string will terminate with a {@code '\0'}
+	 * @param s String to convert
+	 * @return byte sequence of the string it terminates with a {@code '\0'}
 	 */
 	private static byte[] stringToByteWithEnding(String s) {
 		Objects.requireNonNull(s);
@@ -170,7 +178,7 @@ public final class MacroNetServer extends MacroServer {
 	}
 
 	/**
-	 * @return Nome del server per quasta macchina
+	 * @return Name of the server
 	 */
 	public static String serverName() {
 		String name;
@@ -185,7 +193,7 @@ public final class MacroNetServer extends MacroServer {
 	
 	
 	/**
-	 * @return Ottiene indirizzo IP e porta del server
+	 * @return IP addres and port of this server
 	 */
 	public String getSocketInfo() {
 		return serverSocket.getLocalSocketAddress().toString();

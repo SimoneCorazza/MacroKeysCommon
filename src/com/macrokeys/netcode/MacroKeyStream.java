@@ -7,11 +7,12 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Objects;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.macrokeys.MacroKey;
 
 /** 
- * Classe che astrae il livello di comunicazione TCP per la comunicazione
- * tra client e server per l'invio delle macro
+ * Class that abstract the TCP comunication between client and server
  */
 final class MacroKeyStream {
 
@@ -20,10 +21,10 @@ final class MacroKeyStream {
 	private final DataInputStream inStr;
 	
 	/**
-	 * @param s Socket per la comunicazione 
-	 * @throws IOException In caso di errore di IO
+	 * @param s Comunication socket
+	 * @throws IOException In case of an IO error
 	 */
-	public MacroKeyStream(Socket s) throws IOException {
+	public MacroKeyStream(@NonNull Socket s) throws IOException {
 		Objects.requireNonNull(s);
 		
 		this.socket = s;
@@ -35,35 +36,35 @@ final class MacroKeyStream {
 	}
 	
 	/**
-	 * Invia un messaggio per mantenere in vita la connessione.
-	 * Per evitare il timeout del server.
-	 * @throws IOException In caso di errore di IO
+	 * Send a message as a keepalive for the connetion.
+	 * To avoid timeout form the server.
+	 * @throws IOException In case of an IO error
 	 */
 	public void sendKeepAlive() throws IOException {
 		outStr.writeBoolean(true); //Flag per l'inizio di un 
 	}
 	
 	/**
-	 * Avvisa il server dell'esecuzione dell'azione
-	 * @param mk Tasto soggetto all'azione
-	 * @param action Azione relativa al tasto. True: premuto, False: rilasciato
-	 * @throws IOException In caso di errore di IO
+	 * Inform the server of the execution of the action
+	 * @param mk Key subject to the action
+	 * @param action True: pressed, False: released
+	 * @throws IOException In case of an IO error
 	 */
-	public void sendKeyAction(MacroKey mk, boolean action) throws IOException {
+	public void sendKeyAction(@NonNull MacroKey mk, boolean action) throws IOException {
 		outStr.writeBoolean(false);
 		outStr.writeInt(mk.getId());
 		outStr.writeBoolean(action);
 	}
 	
 	/**
-	 * Aspetta la ricezione della prossima azione di un tasto
-	 * @return Azione del tasto
-	 * @throws IOException In caso di errore di IO
+	 * Waits the next action of a key
+	 * @return Action of a key
+	 * @throws IOException In case of an IO error
 	 */
 	public MacroKeyAction receiveKeyAction() throws IOException {
 		boolean messageFlag;
 		do {
-			//Leggo la tipologia di messaggio
+			// Reads the type of message
 			messageFlag = inStr.readBoolean();
 		} while(messageFlag);
 		

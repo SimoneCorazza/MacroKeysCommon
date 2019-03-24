@@ -10,28 +10,28 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-/** Permette di criptare e decriptare messaggi con la crittografia RSA */
+/** Class to encrypt and decrypt messages with RSA */
 public final class RSAServer {
 	
 	private static final String ALG = "RSA";
 	
-	/** Coppia di chiavi pubblica e privata per la comunicazione */
+	/** Key pair (public and private) */
 	private KeyPair keyPair;
 	
-	/** Per criptare */
+	/** Cipher for the encryption */
 	private Cipher cEnc;
 	
-	/** Per decriptare */
+	/** Cipher for the decryption */
 	private Cipher cDec;
 	
 	/**
-	 * @param Length - Lunghezza della chiave in bit
-	 * @throws InvalidParameterException - Parametro errato
+	 * @param length Lenght of the key to generate 
+	 * @throws InvalidParameterException If the keylength is not supported
 	 */
-	public RSAServer(int Length) {
+	public RSAServer(int length) {
 		try {
 			KeyPairGenerator gen = KeyPairGenerator.getInstance(ALG);
-			gen.initialize(Length);
+			gen.initialize(length);
 			keyPair = gen.generateKeyPair();
 			
 			cEnc = Cipher.getInstance("RSA/ECB/OAEPWithSHA1AndMGF1Padding");
@@ -45,9 +45,9 @@ public final class RSAServer {
 	}
 	
 	/**
-	 * Cripta la sequenza di dati
-	 * @param data - Dati da criptare
-	 * @return Dati criptati
+	 * Encrypt the given sequence of data
+	 * @param data Data to encrypt
+	 * @return Encrypted data
 	 */
 	public byte[] encript(byte[] data) {
 		try {
@@ -61,9 +61,9 @@ public final class RSAServer {
 	
 	
 	/**
-	 * Decripta la sequenza di byte
-	 * @param data - Dati da decriptare
-	 * @return Dati decriptati
+	 * Decrypts the given sequence
+	 * @param data Data to decrypt
+	 * @return Decrypted data
 	 */
 	public byte[] decript(byte[] data) {
 		try {
@@ -76,7 +76,7 @@ public final class RSAServer {
 	}
 	
 	/**
-	 * @return Chiave pubblica
+	 * @return Publick key
 	 */
 	public byte[] getPublicKey() {
 		return keyPair.getPublic().getEncoded();

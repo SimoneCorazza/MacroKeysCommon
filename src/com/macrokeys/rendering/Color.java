@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Objects;
 
-/** Classe statica di utility per i colori */
+/** Utility class for colors */
 public final class Color {
 	
 	private Color() { }

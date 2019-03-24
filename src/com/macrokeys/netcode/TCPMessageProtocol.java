@@ -7,39 +7,44 @@ import java.net.SocketException;
 import java.util.Objects;
 import java.util.concurrent.Semaphore;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.macrokeys.comunication.MessageProtocol;
 
 /** 
- * Implementazione TCP del protocollo {@link MessageProtocol}
+ * Implementation of the TCP protocol {@link MessageProtocol}
  */
 public class TCPMessageProtocol implements MessageProtocol {
 	
 	private static final byte CODE_MESSAGE = 0x00;
 	private static final byte CODE_KEEP_ALIVE = 0x01;
 	
-	/** Socket utilizzata */
+	/** Socket to use */
 	private final Socket socket;
-	/** Stream in input alla {@link #socket} */
+	
+	/** Input stream from the {@link #socket} */
 	private final DataInputStream inStr;
-	/** Stream in output alla {@link #socket} */
+	
+	/** Output stream from the {@link #socket} */
 	private final DataOutputStream outStr;
 	
-	/** Thread per il l'invio dei keep alive */
+	/** Thread for the keep alive */
 	private Thread threadKeepalive = null;
-	/** Tempo per il timeout dello strem in output; 0 per infinito, sempre > 0 */
+	
+	/** Timeout for the input stream; 0 for infinity, always > 0 */
 	private int timeoutInput = 0;
-	/** Messaggi inviati dalla scorsa volta che sono stati inviati nell'ultimo periodo */
+	
+	/** Messages sent in the last period*/
 	private int messageSent = 0;
 	
-	/** Semaforo per l'accesso alla socket */
+	/** Semaphore for the socket */
 	private Semaphore sem = new Semaphore(1, true);
 	
 	/**
 	 * @param socket Socket
-	 * @throws IOException Se c'è un errore nella creazione degli stream per la socket
-	 * @throws NullPointerException Se {@code socket} è null
+	 * @throws IOExceptionIf an IO error occurs
 	 */
-	public TCPMessageProtocol(Socket socket) throws IOException {
+	public TCPMessageProtocol(@NonNull Socket socket) throws IOException {
 		Objects.requireNonNull(socket);
 		
 		this.socket = socket;
@@ -50,9 +55,9 @@ public class TCPMessageProtocol implements MessageProtocol {
 	
 	
 	/**
-	 * Imposta il TCP no delay per la socket sottostante
-	 * @param flag Flag di abilitazione del no delay
-	 * @throws IOException Errore di IO
+	 * Sets the TCP no delay for the underlayng socket
+	 * @param flag True enable, false otherwise
+	 * @throws IOException If an IO error occurs
 	 * @see Socket#setTcpNoDelay(boolean)
 	 */
 	public void setTcpNoDelay(boolean flag) throws IOException {
@@ -104,7 +109,7 @@ public class TCPMessageProtocol implements MessageProtocol {
 		try {
 			return socket.getSoTimeout();
 		} catch (SocketException e) {
-			// Caso di errore sottostante ritorno timout infinito
+			// In case of error return infinite timeout
 			return 0;
 		}
 	}
@@ -147,7 +152,7 @@ public class TCPMessageProtocol implements MessageProtocol {
 			code = inStr.readByte();
 		}
 		
-		// Leggo il resto del messaggio
+		// Read the rest of the message
 		int leng = inStr.readInt();
 		byte[] payload = new byte[leng];
 		inStr.readFully(payload);
@@ -179,14 +184,14 @@ public class TCPMessageProtocol implements MessageProtocol {
 	}
 	
 	
-	/** Thread per la funzione di keep alive */
+	/** Keep alive thread */
 	private class ThreadKeepAlive implements Runnable {
 
 		@Override
 		public void run() {
 			while(true) {
 				if(messageSent <= 0) {
-					// Invio il messaggio
+					// Send the keep alive message
 					try {
 						sem.acquire();
 						outStr.writeByte(CODE_KEEP_ALIVE);
@@ -203,7 +208,9 @@ public class TCPMessageProtocol implements MessageProtocol {
 						break;
 					}
 				}
-				messageSent = 0; // Resetto i messaggi
+				
+				// Reset the messages
+				messageSent = 0;
 			}
 		}
 		

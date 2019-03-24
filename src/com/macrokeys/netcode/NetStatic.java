@@ -2,12 +2,13 @@ package com.macrokeys.netcode;
 
 import java.nio.charset.StandardCharsets;
 
-/** Classe statica per raccogliere informazioni comuni tra client e server (es. chiavi, id) */
+/** 
+ * Static class for common info between client and server
+ */
 final class NetStatic {
 	
     /**
-     * Sequenza che permette al Server ricevente di identificare il Client
-     * durante il SSDP (con multicast)
+     * Sequence that identificates the client during and SSDP request
      */
     public static final byte[] SSDP_CLIENT_KEY = new byte[] {
             (byte) 209,
@@ -140,7 +141,9 @@ final class NetStatic {
             (byte) 100
     };
 	
-    /** Sequenza che identifica il Server durante l'SSDP (con multicast) */
+    /** 
+     * Sequence that identificates the server during and SSDP request
+     */
     public static final byte[] SSDP_SERVER_KEY = new byte[] {
             (byte) 141,
             (byte) 230,
@@ -272,23 +275,27 @@ final class NetStatic {
             (byte) 36
     };
     
-    /** Dimensione del nome del Server in byte, quando si effettua l'SSDP */
+    /** Maximum byte size of the server name. Used during the SSDP */
     public static final int SSDP_NAME_LENGTH = 32;
     
-    /** Indirizzo multicast per l'SSDP */
+    /** Multicast address for the SSDP */
     public static final String MULTICAST_ADDR = "239.255.255.250";
     
-    /** Indirizzo brodcast */
+    /** Brodcast address */
     public static final String BRODCAST_ADDR = "255.255.255.255";
     
-    /** 
-     * Porta TCP utilizzata per la comunicazione tra {@link MacroNetClient} e
-     * {@link MacroNetServer}.
-     * Questa stessa porta è utilizzata da per il servizio di SSDP, utilizzando UDP.
+    /**
+     * Port used for:
+     * <p>
+     * <ul>
+     * <li>TCP comunication between {@link MacroNetClient} e {@link MacroNetServer}
+     * <li>UDP comunication for the SSDP
+     * </ul>
+     * </p>
      */
     public static final int PORT = 10414;
     
-	/** Header che permette di identificare il server */
+	/** Header to identify the server */
 	public static final byte[] SERVER_IDENTIFIER = 
 			"pinopanco".getBytes(StandardCharsets.UTF_8);
 	
