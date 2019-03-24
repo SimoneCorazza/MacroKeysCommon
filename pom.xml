@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.macrokeys</groupId>
   <artifactId>macro-keys-common</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -23,6 +23,9 @@
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.1.1</version>
+        <configuration>
+          <finalName>macro-keys-common</finalName>                   
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
