@@ -118,10 +118,11 @@ public class MacroNetClient extends MacroClient {
             }
         } catch (SocketTimeoutException e) {
             // This exception is always generated and the method must continue
+        } finally {
+        	clientSocket.close();        	
         }
 
 
-        clientSocket.close();
 
         // To array
         SSDPServerInfo[] arr = new SSDPServerInfo[serversInfo.size()];

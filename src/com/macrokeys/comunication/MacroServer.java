@@ -610,6 +610,7 @@ public abstract class MacroServer {
 	    		try {
 					Thread.sleep(FREE_TIME);
 				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
 					return;
 				}
 	    		

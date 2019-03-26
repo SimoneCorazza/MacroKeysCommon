@@ -122,6 +122,7 @@ public class TCPMessageProtocol implements MessageProtocol {
 			sem.acquire();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+			Thread.currentThread().interrupt();
 			return;
 		}
 		
@@ -196,6 +197,7 @@ public class TCPMessageProtocol implements MessageProtocol {
 						sem.acquire();
 						outStr.writeByte(CODE_KEEP_ALIVE);
 					} catch(InterruptedException | IOException e) {
+						Thread.currentThread().interrupt();
 						break;
 					} finally {
 						sem.release();
@@ -205,6 +207,7 @@ public class TCPMessageProtocol implements MessageProtocol {
 					try {
 						Thread.sleep(timeoutInput / 2);
 					} catch(InterruptedException e) {
+						Thread.currentThread().interrupt();
 						break;
 					}
 				}
